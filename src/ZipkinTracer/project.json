@@ -1,9 +1,9 @@
-{
+ï»¿{
   "title": "ZipkinTracer",
-  "copyright": "Copyright © 2017 Cinkciarz.pl",
-  "authors": ["Sebastian Bebrys", "Sebastian Pieni¹¿ek"], 
-  "description": ".Net Zipkin Tracer",
-  "version": "1.0.0-beta.1",
+  "copyright": "Copyright Â© 2017 Cinkciarz.pl",
+  "authors": ["Sebastian Bebrys", "Sebastian PieniÄ…Å¼ek"], 
+  "description": ".Net Core Zipkin Tracer",
+  "version": "1.0.0-*",
 
   "dependencies": {
     "Microsoft.AspNetCore.Http.Abstractions": "1.1.0",
@@ -25,6 +25,7 @@
   },
 
   "packOptions": {
-    "owners": [ "Cinkciarz.pl" ]
+    "owners": [ "Cinkciarz.pl" ],
+    "tags": [ "Zipkin", "ZipkinClient", "ZipkinTracer", "Zipkin Client", "Zipkin Tracer", ".Net Core Zipkin" ]
   } 
 }
