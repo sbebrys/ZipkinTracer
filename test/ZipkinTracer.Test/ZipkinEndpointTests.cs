@@ -1,0 +1,41 @@
+﻿using System;
+using System.Threading.Tasks;
+using NUnit.Framework;
+
+namespace ZipkinTracer.Test
+{
+    [TestFixture]
+    public class ZipkinEndpointTests
+    {
+
+        [Test]
+        public async Task GetLocalEndpoint()
+        {
+            var serviceName = "name";
+            ushort port = 12312;
+
+            var zipkinEndpoint = new ServiceEndpoint();
+            var endpoint = await zipkinEndpoint.GetLocalEndpoint(serviceName, port);
+
+            Assert.IsNotNull(endpoint);
+            Assert.AreEqual(serviceName, endpoint.ServiceName);
+            Assert.IsNotNull(endpoint.IPAddress);
+            Assert.IsNotNull(endpoint.Port);
+        }
+
+        [Test]
+        public async Task GetRemoteEndpoint()
+        {
+            var remoteUri = new Uri("http://localhost");
+            var serviceName = "name";
+
+            var zipkinEndpoint = new ServiceEndpoint();
+            var endpoint = await zipkinEndpoint.GetRemoteEndpoint(remoteUri, serviceName);
+
+            Assert.IsNotNull(endpoint);
+            Assert.AreEqual(serviceName, endpoint.ServiceName);
+            Assert.IsNotNull(endpoint.IPAddress);
+            Assert.IsNotNull(endpoint.Port);
+        }
+    }
+}

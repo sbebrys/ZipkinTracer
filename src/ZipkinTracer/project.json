@@ -1,0 +1,30 @@
+{
+  "title": "ZipkinTracer",
+  "copyright": "Copyright © 2017 Cinkciarz.pl",
+  "authors": ["Sebastian Bebrys", "Sebastian Pieni¹¿ek"], 
+  "description": ".Net Zipkin Tracer",
+  "version": "1.0.0-beta.1",
+
+  "dependencies": {
+    "Microsoft.AspNetCore.Http.Abstractions": "1.1.0",
+    "Microsoft.AspNetCore.Http.Extensions": "1.1.0",
+    "Microsoft.AspNetCore.Owin": "1.1.0",
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0",
+    "Microsoft.Extensions.Logging": "1.1.0",
+    "Microsoft.Extensions.Logging.Abstractions": "1.1.0",
+    "Newtonsoft.Json": "9.0.1",
+    "System.Net.NameResolution": "4.3.0",
+    "System.Net.NetworkInformation": "4.3.0"
+  },
+
+  "frameworks": {
+    "netstandard1.3": {
+    },
+    "net46": {
+    }
+  },
+
+  "packOptions": {
+    "owners": [ "Cinkciarz.pl" ]
+  } 
+}
