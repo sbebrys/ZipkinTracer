@@ -3,7 +3,7 @@
 	"copyright": "Copyright © 2017 Cinkciarz.pl",
 	"authors": [ "Sebastian Bebrys", "Sebastian Pieniążek" ],
 	"description": ".Net Core Zipkin Tracer",
-	"version": "1.0.0-RC004",
+	"version": "1.0.0-RC005",
 
 	"dependencies": {
 		"Microsoft.AspNetCore.Http.Abstractions": "1.1.0",

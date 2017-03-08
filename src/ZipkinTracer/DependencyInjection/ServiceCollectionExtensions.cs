@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using ZipkinTracer.Internal;
 using ZipkinTracer.Models;
@@ -19,8 +20,9 @@ namespace ZipkinTracer.DependencyInjection
             services.AddSingleton<IServiceEndpoint, ServiceEndpoint>();
             services.AddSingleton<ISpanProcessorTask, SpanProcessorTask>();
             services.AddSingleton<ISpanProcessor, SpanProcessor>();
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddScoped<ISpanCollector, SpanCollector>();
+			services.AddScoped<ISpanCollector, SpanCollector>();
             services.AddScoped<IZipkinTracer, ZipkinClient>();
             services.AddScoped<ITraceProvider, TraceProvider>();
             services.AddScoped<ISpanTracer, SpanTracer>();
