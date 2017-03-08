@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
+using ZipkinTracer.Internal;
 
 namespace ZipkinTracer.Test
 {

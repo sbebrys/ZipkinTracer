@@ -5,7 +5,7 @@ using ZipkinTracer.Models;
 
 namespace ZipkinTracer
 {
-    public interface ITracerClient
+    public interface IZipkinTracer
     {
         bool IsTraceOn { get; }
 

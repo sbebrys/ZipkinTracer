@@ -1,4 +1,4 @@
-﻿version: 1.0.0-beta{build}
+﻿version: 1.0.{build}
 branches:
   only:
   - dev
@@ -16,9 +16,5 @@ deploy:
   on:
     branch: dev
 
-#---------------------------------#
-#  Skip builds for doc changes    #
-#---------------------------------#
 skip_commits:
-  # Regex for matching commit message
   message: /docs.*/

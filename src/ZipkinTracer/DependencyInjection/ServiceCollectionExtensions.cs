@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
+using ZipkinTracer.Internal;
 using ZipkinTracer.Models;
 
 namespace ZipkinTracer.DependencyInjection
@@ -19,10 +20,10 @@ namespace ZipkinTracer.DependencyInjection
             services.AddSingleton<ISpanProcessorTask, SpanProcessorTask>();
             services.AddSingleton<ISpanProcessor, SpanProcessor>();
 
-            services.AddTransient<ISpanCollector, SpanCollector>();
-            services.AddTransient<ITracerClient, ZipkinClient>();
-            services.AddTransient<ITraceProvider, TraceProvider>();
-            services.AddTransient<ISpanTracer, SpanTracer>();
+            services.AddScoped<ISpanCollector, SpanCollector>();
+            services.AddScoped<IZipkinTracer, ZipkinClient>();
+            services.AddScoped<ITraceProvider, TraceProvider>();
+            services.AddScoped<ISpanTracer, SpanTracer>();
         }
     }
 }

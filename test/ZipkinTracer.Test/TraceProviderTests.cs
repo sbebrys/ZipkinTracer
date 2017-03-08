@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using NUnit.Framework;
+using ZipkinTracer.Internal;
 
 namespace ZipkinTracer.Test
 {

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using ZipkinTracer.Models;
 
-namespace ZipkinTracer
+namespace ZipkinTracer.Internal
 {
     internal interface IServiceEndpoint
     {

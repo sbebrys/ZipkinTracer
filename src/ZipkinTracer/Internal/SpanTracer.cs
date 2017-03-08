@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using ZipkinTracer.Models;
 using ZipkinTracer.Models.References;
 
-namespace ZipkinTracer
+namespace ZipkinTracer.Internal
 {
     internal sealed class SpanTracer : ISpanTracer
     {
@@ -61,7 +61,7 @@ namespace ZipkinTracer
                 throw new ArgumentException("Invalid server span: Annotations list is invalid.");
             }
 
-            var annotation = new Annotation()
+            var annotation = new Annotation
             {
                 Host = span.Annotations.First().Host,
                 Value = ZipkinConstants.ServerSend

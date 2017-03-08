@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using NUnit.Framework;
+using ZipkinTracer.Internal;
 using ZipkinTracer.Models;
 
 namespace ZipkinTracer.Test

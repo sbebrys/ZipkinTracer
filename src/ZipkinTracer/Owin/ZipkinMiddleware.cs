@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using ZipkinTracer.Internal;
 
 namespace ZipkinTracer.Owin
 {
@@ -31,7 +32,7 @@ namespace ZipkinTracer.Owin
                 return;
             }
 
-            var traceClient = context.RequestServices.GetRequiredService<ITracerClient>();
+            var traceClient = context.RequestServices.GetRequiredService<IZipkinTracer>();
             var span = await traceClient.StartServerTrace(new Uri(context.Request.GetEncodedUrl()), context.Request.Method);
             try
             {
@@ -46,7 +47,7 @@ namespace ZipkinTracer.Owin
 
     public static class AppBuilderExtensions
     {
-        public static void UseZipkin(this IApplicationBuilder app)
+        public static void UseZipkinTracer(this IApplicationBuilder app)
         {
             app.UseMiddleware<ZipkinMiddleware>();
         }

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace ZipkinTracer
+namespace ZipkinTracer.Internal
 {
     internal interface ISpanProcessor
     {

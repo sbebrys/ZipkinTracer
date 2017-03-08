@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ZipkinTracer.Helpers;
 
-namespace ZipkinTracer
+namespace ZipkinTracer.Internal
 {
     internal class SpanProcessorTask : ISpanProcessorTask
     {

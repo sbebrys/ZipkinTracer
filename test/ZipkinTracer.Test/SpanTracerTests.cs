@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using NUnit.Framework;
+using ZipkinTracer.Internal;
 using ZipkinTracer.Models;
 using ZipkinTracer.Models.References;
 

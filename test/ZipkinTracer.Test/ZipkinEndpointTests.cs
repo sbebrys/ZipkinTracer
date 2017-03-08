@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using ZipkinTracer.Internal;
 
 namespace ZipkinTracer.Test
 {

@@ -1,19 +1,20 @@
 ﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using ZipkinTracer.Internal;
 
-namespace ZipkinTracer.Handlers
+namespace ZipkinTracer.Http
 {
     public class ZipkinMessageHandler : DelegatingHandler
     {
-        private readonly ITracerClient _client;
+        private readonly IZipkinTracer _client;
 
-        public ZipkinMessageHandler(ITracerClient client)
+        public ZipkinMessageHandler(IZipkinTracer client)
+			:this(client, new HttpClientHandler())
         {
-            _client = client;
         }
 
-        public ZipkinMessageHandler(ITracerClient client, HttpMessageHandler innerHandler)
+        public ZipkinMessageHandler(IZipkinTracer client, HttpMessageHandler innerHandler)
             : base(innerHandler)
         {
             _client = client;
@@ -21,8 +22,6 @@ namespace ZipkinTracer.Handlers
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            InnerHandler = InnerHandler ?? new HttpClientHandler();
-
             if (!_client.IsTraceOn)
             {
                 return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
