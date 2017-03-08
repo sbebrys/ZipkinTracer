@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using ZipkinTracer.Models;
 
-namespace ZipkinTracer
+namespace ZipkinTracer.Internal
 {
     internal class SpanCollector : ISpanCollector
     {

@@ -10,26 +10,30 @@ namespace ZipkinTracer
     /// <summary>
     /// Zipkin Tracer client
     /// </summary>
-    public class ZipkinClient : ITracerClient
+    public class ZipkinClient : IZipkinTracer
     {
         private readonly ISpanTracer _spanTracer;
         private readonly ITraceProvider _traceProvider;
+        private readonly ZipkinConfig _zipkinConfig;
         private readonly ILogger<ZipkinClient> _logger;
 
-        public bool IsTraceOn => !string.IsNullOrEmpty(_traceProvider.TraceId) && _traceProvider.IsSampled;
+        public bool IsTraceOn => !string.IsNullOrEmpty(_traceProvider.TraceId) && _traceProvider.IsSampled && _zipkinConfig.Enabled;
 
         /// <summary>
         /// .ctor
         /// </summary>
+        /// <param name="zipkinConfig"></param>
         /// <param name="traceProvider"></param>
         /// <param name="spanTracer"></param>
         /// <param name="logger"></param>
-        public ZipkinClient(ITraceProvider traceProvider, ISpanTracer spanTracer, ILogger<ZipkinClient> logger)
+        public ZipkinClient(ZipkinConfig zipkinConfig, ITraceProvider traceProvider, ISpanTracer spanTracer, ILogger<ZipkinClient> logger)
         {
+            if (zipkinConfig == null) throw new ArgumentNullException(nameof(zipkinConfig));
             if (traceProvider == null) throw new ArgumentNullException(nameof(traceProvider));
             if (spanTracer == null) throw new ArgumentNullException(nameof(spanTracer));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
+            _zipkinConfig = zipkinConfig;
             _logger = logger;
             _spanTracer = spanTracer;
             _traceProvider = traceProvider;

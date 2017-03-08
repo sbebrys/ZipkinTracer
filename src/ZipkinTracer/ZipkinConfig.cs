@@ -80,6 +80,11 @@ namespace ZipkinTracer
         public TimeSpan EncounteredAnErrorDelayTime { get; set; } = TimeSpan.FromSeconds(30);
 
         /// <summary>
+        /// Is trace is global enabled 
+        /// </summary>
+        public bool Enabled { get; set; } = true;
+
+        /// <summary>
         /// .ctor
         /// </summary>
         /// <param name="zipkinBaseUri">Zipkin serwer uri</param>

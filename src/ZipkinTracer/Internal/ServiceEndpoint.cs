@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using ZipkinTracer.Models;
 
-namespace ZipkinTracer
+namespace ZipkinTracer.Internal
 {
     internal class ServiceEndpoint : IServiceEndpoint
     {

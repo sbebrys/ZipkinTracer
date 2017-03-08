@@ -10,7 +10,7 @@ using ZipkinTracer.Helpers;
 using ZipkinTracer.Models;
 using ZipkinTracer.Models.Serialization.Json;
 
-namespace ZipkinTracer
+namespace ZipkinTracer.Internal
 {
     internal class SpanProcessor : ISpanProcessor
     {

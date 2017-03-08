@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using ZipkinTracer.Helpers;
 
-namespace ZipkinTracer
+namespace ZipkinTracer.Internal
 {
     /// <summary>
     /// TraceProvider class
