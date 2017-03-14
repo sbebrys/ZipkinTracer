@@ -24,5 +24,6 @@ namespace ZipkinTracer
         Task RecordLocalComponent(Span span, string value);
 
         ITraceProvider GetNextTrace();
+        //TraceInfo GetNextTraceInfo();
     }
 }

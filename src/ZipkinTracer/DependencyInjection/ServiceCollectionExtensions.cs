@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using ZipkinTracer.Internal;
 using ZipkinTracer.Models;
+using ZipkinTracer.Http;
 
 namespace ZipkinTracer.DependencyInjection
 {
@@ -21,6 +22,7 @@ namespace ZipkinTracer.DependencyInjection
             services.AddSingleton<ISpanProcessorTask, SpanProcessorTask>();
             services.AddSingleton<ISpanProcessor, SpanProcessor>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            //services.AddSingleton<ITraceInfoAccessor, TraceInfoAccessor>();
 
             services.AddScoped<ISpanCollector, SpanCollector>();
             services.AddScoped<IZipkinTracer, ZipkinClient>();
