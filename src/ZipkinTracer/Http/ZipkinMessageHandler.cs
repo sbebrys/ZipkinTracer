@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using ZipkinTracer.Internal;
+using ZipkinTracer.Models;
 
 namespace ZipkinTracer.Http
 {
@@ -10,7 +11,7 @@ namespace ZipkinTracer.Http
         private readonly IZipkinTracer _client;
 
         public ZipkinMessageHandler(IZipkinTracer client)
-			:this(client, new HttpClientHandler())
+			: this(client, new HttpClientHandler())
         {
         }
 
@@ -22,21 +23,21 @@ namespace ZipkinTracer.Http
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            if (!_client.IsTraceOn)
-            {
-                return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            }
+            // open new span
+            var traceInfo = _client.CreateInnerSpan();
 
-            var nextTrace = _client.GetNextTrace();
+            // start record span
+            var span = await _client.StartClientTrace(request.RequestUri, request.Method.ToString(), traceInfo);
+            
+            // rewrite traceInfo to request headers
+            request.Headers.Add(TraceInfo.TraceIdHeaderName, traceInfo.TraceId);
+            request.Headers.Add(TraceInfo.SpanIdHeaderName, traceInfo.SpanId);
+            request.Headers.Add(TraceInfo.ParentSpanIdHeaderName, traceInfo.ParentSpanId);
+            request.Headers.Add(TraceInfo.SampledHeaderName, traceInfo.IsSampled.ToString());
 
-            request.Headers.Add(TraceProvider.TraceIdHeaderName, nextTrace.TraceId);
-            request.Headers.Add(TraceProvider.SpanIdHeaderName, nextTrace.SpanId);
-            request.Headers.Add(TraceProvider.ParentSpanIdHeaderName, nextTrace.ParentSpanId);
-            request.Headers.Add(TraceProvider.SampledHeaderName, nextTrace.ParentSpanId);
-
-            var span = await _client.StartClientTrace(request.RequestUri, request.Method.ToString(), nextTrace);
             var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
+            // end record span
             _client.EndClientTrace(span, (int)response.StatusCode);
 
             return response;

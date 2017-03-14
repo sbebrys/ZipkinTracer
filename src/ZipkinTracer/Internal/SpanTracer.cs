@@ -12,28 +12,22 @@ namespace ZipkinTracer.Internal
         private readonly ISpanCollector _spanCollector;
         private readonly IServiceEndpoint _zipkinEndpoint;
         private readonly ZipkinConfig _zipkinConfig;
-        private readonly IHttpContextAccessor _contextAccessor;
 
-        public SpanTracer(ZipkinConfig zipkinConfig, ISpanCollector spanCollector, IServiceEndpoint zipkinEndpoint, IHttpContextAccessor contextAccessor)
+        public SpanTracer(ZipkinConfig zipkinConfig, ISpanCollector spanCollector, IServiceEndpoint zipkinEndpoint)
         {
             if (zipkinConfig == null) throw new ArgumentNullException(nameof(zipkinConfig));
             if (spanCollector == null) throw new ArgumentNullException(nameof(spanCollector));
             if (zipkinEndpoint == null) throw new ArgumentNullException(nameof(zipkinEndpoint));
-            if (contextAccessor == null) throw new ArgumentNullException(nameof(contextAccessor));
 
             _spanCollector = spanCollector;
             _zipkinEndpoint = zipkinEndpoint;
             _zipkinConfig = zipkinConfig;
-            _contextAccessor = contextAccessor;
         }
 
-        public async Task<Span> ReceiveServerSpan(string spanName, string traceId, string parentSpanId, string spanId, Uri requestUri)
+        public async Task<Span> ReceiveServerSpan(string spanName, TraceInfo traceInfo, Uri requestUri)
         {
-            var context = _contextAccessor.HttpContext;
-            var domain = _zipkinConfig.Domain(context.Request);
-            var serviceName = CleanServiceName(domain.Host);
-
-            var newSpan = CreateNewSpan(spanName, traceId, parentSpanId, spanId);
+            var serviceName = CleanServiceName(traceInfo.Domain.Host);
+            var newSpan = new Span(spanName, traceInfo.SpanId, traceInfo.ParentSpanId, traceInfo.TraceId, traceInfo.Domain);
             var serviceEndpoint = await _zipkinEndpoint.GetLocalEndpoint(serviceName, (ushort)requestUri.Port);
 
             var annotation = new Annotation
@@ -72,13 +66,10 @@ namespace ZipkinTracer.Internal
             _spanCollector.Collect(span);
         }
 
-        public async Task<Span> SendClientSpan(string spanName, string traceId, string parentSpanId, string spanId, Uri remoteUri)
+        public async Task<Span> SendClientSpan(string spanName, TraceInfo traceInfo, Uri remoteUri)
         {
-            var context = _contextAccessor.HttpContext;
-            var domain = _zipkinConfig.Domain(context.Request);
-            var serviceName = CleanServiceName(domain.Host);
-
-            var newSpan = CreateNewSpan(spanName, traceId, parentSpanId, spanId);
+            var serviceName = CleanServiceName(traceInfo.Domain.Host);
+            var newSpan = new Span(spanName, traceInfo.SpanId, traceInfo.ParentSpanId, traceInfo.TraceId, traceInfo.Domain);
             var serviceEndpoint = await _zipkinEndpoint.GetLocalEndpoint(serviceName, (ushort)remoteUri.Port);
             var clientServiceName = CleanServiceName(remoteUri.Host);
 
@@ -93,19 +84,6 @@ namespace ZipkinTracer.Internal
             AddBinaryAnnotation("sa", "1", newSpan, await _zipkinEndpoint.GetRemoteEndpoint(remoteUri, clientServiceName));
 
             return newSpan;
-        }
-
-        private string CleanServiceName(string host)
-        {
-            foreach (var domain in _zipkinConfig.NotToBeDisplayedDomainList)
-            {
-                if (host.Contains(domain))
-                {
-                    return host.Replace(domain, string.Empty);
-                }
-            }
-
-            return host;
         }
 
         public void ReceiveClientSpan(Span span, int statusCode)
@@ -134,11 +112,8 @@ namespace ZipkinTracer.Internal
 
         public async Task Record(Span span, string value)
         {
-            var context = _contextAccessor.HttpContext;
-            var domain = _zipkinConfig.Domain(context.Request);
-
-            var serviceName = CleanServiceName(domain.Host);
-            var servicePort = (ushort)domain.Port;
+            var serviceName = CleanServiceName(span.Domain.Host);
+            var servicePort = (ushort)span.Domain.Port;
 
             if (span == null)
                 throw new ArgumentNullException(nameof(span), "In order to record an annotation, the span must be not null.");
@@ -151,12 +126,9 @@ namespace ZipkinTracer.Internal
         }
 
         public async Task RecordBinary(Span span, string key, object value)
-        {
-            var context = _contextAccessor.HttpContext;
-            var domain = _zipkinConfig.Domain(context.Request);
-
-            var serviceName = CleanServiceName(domain.Host);
-            var servicePort = (ushort)domain.Port;
+        { 
+            var serviceName = CleanServiceName(span.Domain.Host);
+            var servicePort = (ushort)span.Domain.Port;
 
             if (span == null)
                 throw new ArgumentNullException(nameof(span), "In order to record a binary annotation, the span must be not null.");
@@ -171,15 +143,17 @@ namespace ZipkinTracer.Internal
             });
         }
 
-        private static Span CreateNewSpan(string spanName, string traceId, string parentSpanId, string spanId)
+        private string CleanServiceName(string host)
         {
-            return new Span
+            foreach (var domain in _zipkinConfig.NotToBeDisplayedDomainList)
             {
-                Name = spanName,
-                TraceId = traceId,
-                ParentId = parentSpanId,
-                Id = spanId
-            };
+                if (host.Contains(domain))
+                {
+                    return host.Replace(domain, string.Empty);
+                }
+            }
+
+            return host;
         }
 
         private void AddBinaryAnnotation(string key, object value, Span span, Endpoint endpoint)

@@ -1,8 +1,8 @@
 ﻿using ZipkinTracer.Models;
 
-namespace ZipkinTracer.Http
+namespace ZipkinTracer
 {
-    interface ITraceInfoAccessor
+    public interface ITraceInfoAccessor
     {
         TraceInfo TraceInfo { get; set; }
     }

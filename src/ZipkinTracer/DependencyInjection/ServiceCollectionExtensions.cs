@@ -21,12 +21,10 @@ namespace ZipkinTracer.DependencyInjection
             services.AddSingleton<IServiceEndpoint, ServiceEndpoint>();
             services.AddSingleton<ISpanProcessorTask, SpanProcessorTask>();
             services.AddSingleton<ISpanProcessor, SpanProcessor>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            //services.AddSingleton<ITraceInfoAccessor, TraceInfoAccessor>();
+            services.AddSingleton<ITraceInfoAccessor, TraceInfoAccessor>();
 
             services.AddScoped<ISpanCollector, SpanCollector>();
             services.AddScoped<IZipkinTracer, ZipkinClient>();
-            services.AddScoped<ITraceProvider, TraceProvider>();
             services.AddScoped<ISpanTracer, SpanTracer>();
         }
     }

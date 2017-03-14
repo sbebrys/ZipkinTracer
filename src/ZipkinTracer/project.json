@@ -1,21 +1,21 @@
-﻿{
+{
 	"title": "ZipkinTracer",
 	"copyright": "Copyright © 2017 Cinkciarz.pl",
 	"authors": [ "Sebastian Bebrys", "Sebastian Pieniążek" ],
 	"description": ".Net Core Zipkin Tracer",
 	"version": "1.0.0-RC005",
 
-	"dependencies": {
-		"Microsoft.AspNetCore.Http.Abstractions": "1.1.0",
-		"Microsoft.AspNetCore.Http.Extensions": "1.1.0",
-		"Microsoft.AspNetCore.Owin": "1.1.0",
-		"Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0",
-		"Microsoft.Extensions.Logging": "1.1.0",
-		"Microsoft.Extensions.Logging.Abstractions": "1.1.0",
-		"Newtonsoft.Json": "9.0.1",
-		"System.Net.NameResolution": "4.3.0",
-		"System.Net.NetworkInformation": "4.3.0"
-	},
+  "dependencies": {
+    "Microsoft.AspNetCore.Http.Abstractions": "1.1.1",
+    "Microsoft.AspNetCore.Http.Extensions": "1.1.1",
+    "Microsoft.AspNetCore.Owin": "1.1.1",
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0",
+    "Microsoft.Extensions.Logging": "1.1.1",
+    "Microsoft.Extensions.Logging.Abstractions": "1.1.1",
+    "Newtonsoft.Json": "10.0.1-beta1",
+    "System.Net.NameResolution": "4.3.0",
+    "System.Net.NetworkInformation": "4.3.0"
+  },
 
 	"frameworks": {
 		"netstandard1.3": {

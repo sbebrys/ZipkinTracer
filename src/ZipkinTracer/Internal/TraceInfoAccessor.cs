@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using ZipkinTracer.Models;
 
-namespace ZipkinTracer.Http
+namespace ZipkinTracer.Internal
 {
-    public class TraceInfoAccessor : ITraceInfoAccessor
+    internal class TraceInfoAccessor : ITraceInfoAccessor
     {
         private static AsyncLocal<TraceInfo> _traceInfoCurrent = new AsyncLocal<TraceInfo>();
 
