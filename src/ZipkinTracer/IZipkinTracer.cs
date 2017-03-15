@@ -7,11 +7,9 @@ namespace ZipkinTracer
 {
     public interface IZipkinTracer
     {
-        bool IsTraceOn { get; }
-
         Task<Span> StartServerTrace(Uri requestUri, string methodName);
 
-        Task<Span> StartClientTrace(Uri remoteUri, string methodName, ITraceProvider trace);
+        Task<Span> StartClientTrace(Uri remoteUri, string methodName, TraceInfo traceInfo);
 
         void EndServerTrace(Span serverSpan);
 
@@ -23,6 +21,6 @@ namespace ZipkinTracer
 
         Task RecordLocalComponent(Span span, string value);
 
-        ITraceProvider GetNextTrace();
+        TraceInfo CreateInnerSpan();
     }
 }

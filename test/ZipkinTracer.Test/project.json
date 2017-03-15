@@ -7,9 +7,9 @@
 
   "dependencies": {
     "dotnet-test-nunit": "3.4.0-beta-3",
-    "FluentAssertions": "4.18.0",
-    "NSubstitute": "2.0.1-rc",
-    "NUnit": "3.6.0",
+    "FluentAssertions": "4.19.2",
+    "NSubstitute": "2.0.2",
+    "NUnit": "3.6.1",
     "ZipkinTracer": {
       "target": "project"
     }
