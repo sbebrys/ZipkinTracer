@@ -32,7 +32,7 @@ namespace ZipkinTracer.Test
             var collection = new BlockingCollection<Span>();
             var collector = new SpanCollector(collection);
 
-            collector.Collect(new Span());
+            collector.Collect(new Span(string.Empty, string.Empty, string.Empty, string.Empty, null));
 
             Assert.AreEqual(collection.Count, 1);
         }
@@ -53,8 +53,9 @@ namespace ZipkinTracer.Test
         [Test]
         public void TryTake_NotEmptyCollection_ReturnSpan()
         {
-            var span = new Span { Id = "TestSpanId" };
-            var collection = new BlockingCollection<Span>();
+	        var span = new Span(string.Empty, "TestSpanId", string.Empty, string.Empty, null);
+
+			var collection = new BlockingCollection<Span>();
             var collector = new SpanCollector(collection);
 
             collection.Add(span);
@@ -69,7 +70,7 @@ namespace ZipkinTracer.Test
         [Test]
         public void TryTake_NotEmptyCollection_ClearCollection()
         {
-            var span = new Span {Id = "TestSpanId"};
+            var span = new Span(string.Empty, "TestSpanId", string.Empty, string.Empty, null);;
             var collection = new BlockingCollection<Span>();
             var collector = new SpanCollector(collection);
 
