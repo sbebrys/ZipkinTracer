@@ -5,18 +5,18 @@ namespace ZipkinTracer.Internal
 {
     internal class TraceInfoAccessor : ITraceInfoAccessor
     {
-        private static AsyncLocal<TraceInfo> _traceInfoCurrent = new AsyncLocal<TraceInfo>();
+        private static readonly AsyncLocal<TraceInfo> TraceInfoCurrent = new AsyncLocal<TraceInfo>();
 
         public TraceInfo TraceInfo
         {
             get
             {
-                return _traceInfoCurrent.Value;
+                return TraceInfoCurrent.Value;
             }
 
             set
             {
-                _traceInfoCurrent.Value = value;
+				TraceInfoCurrent.Value = value;
             }
         }
     }

@@ -47,7 +47,7 @@ namespace ZipkinTracer
         /// <returns>Span of client trace</returns>
         public Task<Span> StartClientTrace(Uri remoteUri, string methodName, TraceInfo traceInfo)
         {
-            if (!traceInfo.IsTraceOn || !_zipkinConfig.Enabled || string.IsNullOrEmpty(methodName))
+            if (traceInfo == null || !traceInfo.IsTraceOn || !_zipkinConfig.Enabled || string.IsNullOrEmpty(methodName))
                 return Task.FromResult<Span>(null);
 
             try
@@ -71,8 +71,8 @@ namespace ZipkinTracer
 
             return new TraceInfo(
                 traceInfo.TraceId,
+				TraceIdHelper.GenerateHexEncodedInt64Id(),
                 traceInfo.SpanId,
-                TraceIdHelper.GenerateHexEncodedInt64Id(),
                 traceInfo.IsSampled, 
                 traceInfo.Domain);
         }
@@ -84,7 +84,7 @@ namespace ZipkinTracer
         /// <param name="statusCode"></param>
         public void EndClientTrace(Span clientSpan, int statusCode)
         {
-            if (clientSpan == null)
+            if (string.IsNullOrEmpty(clientSpan?.TraceId))
                 return;
 
             try
@@ -127,10 +127,10 @@ namespace ZipkinTracer
         /// <param name="serverSpan"></param>
         public void EndServerTrace(Span serverSpan)
         {
-            if (serverSpan == null)
-                return;
+			if (string.IsNullOrEmpty(serverSpan?.TraceId))
+				return;
 
-            try
+			try
             {
                 _spanTracer.SendServerSpan(serverSpan);
             }
@@ -148,10 +148,10 @@ namespace ZipkinTracer
         /// (or its value set to null), the method caller member name will be automatically passed.</param>
         public async Task Record(Span span, [CallerMemberName] string value = null)
         {
-            if (span == null)
-                return;
+			if (string.IsNullOrEmpty(span?.TraceId))
+				return;
 
-            try
+			try
             {
                 await _spanTracer.Record(span, value);
             }
@@ -177,10 +177,10 @@ namespace ZipkinTracer
         /// respective ToString() method.</remarks>
         public async Task RecordBinary<T>(Span span, string key, T value)
         {
-            if (span == null)
-                return;
+			if (string.IsNullOrEmpty(span?.TraceId))
+				return;
 
-            try
+			try
             {
                 await _spanTracer.RecordBinary(span, key, value);
             }
@@ -197,10 +197,10 @@ namespace ZipkinTracer
         /// <param name="value">The value of the local trace to be recorder.</param>
         public async Task RecordLocalComponent(Span span, string value)
         {
-            if (span == null)
-                return;
+			if (string.IsNullOrEmpty(span?.TraceId))
+				return;
 
-            try
+			try
             {
                 await _spanTracer.RecordBinary(span, ZipkinConstants.LocalComponent, value);
             }
