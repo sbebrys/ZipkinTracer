@@ -4,10 +4,8 @@ namespace ZipkinTracer.Models
 {
     public class Annotation : AnnotationBase
     {
-        public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
         public string Value { get; set; }
-
-        public int DurationMilliseconds { get; set; }
     }
 }

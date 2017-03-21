@@ -1,4 +1,5 @@
-﻿using ZipkinTracer.Models.References;
+﻿using ZipkinTracer.Extensions;
+using ZipkinTracer.Models.References;
 
 namespace ZipkinTracer.Models
 {

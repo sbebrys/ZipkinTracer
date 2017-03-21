@@ -12,7 +12,7 @@ namespace ZipkinTracer.Test
         [Test]
         public void Ctor_NullQueue_ThrowException()
         {
-            Assert.Catch<ArgumentNullException>(() => new SpanCollector(null), "spanQueue");
+			Assert.Catch<ArgumentNullException>(() => new SpanCollector(null), "spanQueue");
         }
 
         [Test]

@@ -226,11 +226,11 @@ namespace ZipkinTracer.Test
 
 			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
 
-			spanTracer.WhenForAnyArgs(x => x.SendServerSpan(null)).Throw<Exception>();
+			spanTracer.WhenForAnyArgs(x => x.SendServerSpan(null, 0)).Throw<Exception>();
 
             var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
-            Assert.DoesNotThrow(() => zipkinClient.EndServerTrace(new Span("span", "traceId", string.Empty, string.Empty, new Uri("http://localhost"))));
+            Assert.DoesNotThrow(() => zipkinClient.EndServerTrace(new Span("span", "traceId", string.Empty, string.Empty, new Uri("http://localhost")), 200));
         }
 
         [Test]
@@ -245,10 +245,10 @@ namespace ZipkinTracer.Test
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
-            zipkinClient.EndServerTrace(null);
-            zipkinClient.EndServerTrace(new Span("span", "traceId", string.Empty, string.Empty, new Uri("http://localhost")));
+            zipkinClient.EndServerTrace(null, 200);
+            zipkinClient.EndServerTrace(new Span("span", "traceId", string.Empty, string.Empty, new Uri("http://localhost")), 200);
 
-            spanTracer.DidNotReceiveWithAnyArgs().SendServerSpan(null);
+            spanTracer.DidNotReceiveWithAnyArgs().SendServerSpan(null, 200);
         }
 
         [Test]
@@ -263,9 +263,9 @@ namespace ZipkinTracer.Test
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
-            zipkinClient.EndServerTrace(null);
+            zipkinClient.EndServerTrace(null, 200);
 
-            spanTracer.DidNotReceiveWithAnyArgs().SendServerSpan(null);
+            spanTracer.DidNotReceiveWithAnyArgs().SendServerSpan(null, 200);
         }
 
         [Test]
@@ -279,10 +279,10 @@ namespace ZipkinTracer.Test
 			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
-            zipkinClient.EndServerTrace(null);
-            zipkinClient.EndServerTrace(new Span("span", "id", string.Empty, "traceId", new Uri("http://localhost")));
+            zipkinClient.EndServerTrace(null, 200);
+            zipkinClient.EndServerTrace(new Span("span", "id", string.Empty, "traceId", new Uri("http://localhost")), 200);
 
-            spanTracer.ReceivedWithAnyArgs(1).SendServerSpan(null);
+            spanTracer.ReceivedWithAnyArgs(1).SendServerSpan(null, 200);
         }
 
         [Test]

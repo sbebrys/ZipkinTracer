@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -41,16 +42,21 @@ namespace ZipkinTracer.Owin
                 return;
             }
 
-            var traceClient = context.RequestServices.GetRequiredService<IZipkinTracer>();
-            var span = await traceClient.StartServerTrace(new Uri(context.Request.GetEncodedUrl()), context.Request.Method);
-            try
-            {
-                await _next(context);
-            }
-            finally
-            {
-                traceClient.EndServerTrace(span);
-            }
+			var traceClient = context.RequestServices.GetRequiredService<IZipkinTracer>();
+            var span = await traceClient.StartServerTrace(new Uri(context.Request.GetEncodedUrl()), $"{context.Request.Method} {context.Request.Path}");
+
+			context.Response.OnStarting(
+				response =>
+				{
+					var httpResponse = response as HttpResponse;
+					if(httpResponse != null)
+					{
+						traceClient.EndServerTrace(span, httpResponse.StatusCode, IsSuccessStatusCode(httpResponse.StatusCode) ? null : ((HttpStatusCode)httpResponse.StatusCode).ToString());
+					}
+					return Task.CompletedTask;
+				}, context.Response);
+
+            await _next(context);
         }
 
         private void SetTraceInfoProperties(HttpContext context)
@@ -69,7 +75,12 @@ namespace ZipkinTracer.Owin
 
             _traceInfoAccessor.TraceInfo = new TraceInfo(traceId, spanId, parentSpanId, isSampled, domain);
         }
-    }
+
+		private static bool IsSuccessStatusCode(int statusCode)
+		{
+			return statusCode >= 200 && statusCode <= 299;
+		}
+	}
 
     public static class AppBuilderExtensions
     {

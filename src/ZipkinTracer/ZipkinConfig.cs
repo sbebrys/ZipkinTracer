@@ -135,14 +135,7 @@ namespace ZipkinTracer
 
         private bool IsInDontSampleList(string path)
         {
-            if (path != null)
-            {
-                if (ExcludedPathList.Any(uri => path.StartsWith(uri, StringComparison.CurrentCultureIgnoreCase)))
-                {
-                    return true;
-                }
-            }
-            return false;
+	        return path != null && ExcludedPathList.Any(uri => path.StartsWith(uri, StringComparison.CurrentCultureIgnoreCase));
         }
 
         private bool TryParseSampledFlagToBool(string sampledFlag, out bool booleanValue)

@@ -27,7 +27,7 @@ namespace ZipkinTracer.Http
             var traceInfo = _client.CreateInnerSpan();
 
             // start record span
-            var span = await _client.StartClientTrace(request.RequestUri, request.Method.ToString(), traceInfo);
+            var span = await _client.StartClientTrace(request.RequestUri, $"{request.Method} {request.RequestUri.AbsolutePath}", traceInfo);
             
             // rewrite traceInfo to request headers
             request.Headers.Add(TraceInfo.TraceIdHeaderName, traceInfo.TraceId);
@@ -38,7 +38,7 @@ namespace ZipkinTracer.Http
             var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             // end record span
-            _client.EndClientTrace(span, (int)response.StatusCode);
+            _client.EndClientTrace(span, (int)response.StatusCode, response.IsSuccessStatusCode ? null : response.StatusCode.ToString());
 
             return response;
         }

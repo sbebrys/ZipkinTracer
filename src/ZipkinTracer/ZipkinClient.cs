@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using ZipkinTracer.Models;
 using ZipkinTracer.Models.References;
 using ZipkinTracer.Helpers;
+using ZipkinTracer.Internal;
 
 namespace ZipkinTracer
 {
@@ -77,19 +78,20 @@ namespace ZipkinTracer
                 traceInfo.Domain);
         }
 
-        /// <summary>
-        /// Start server trace
-        /// </summary>
-        /// <param name="clientSpan"></param>
-        /// <param name="statusCode"></param>
-        public void EndClientTrace(Span clientSpan, int statusCode)
+	    /// <summary>
+	    /// Start server trace
+	    /// </summary>
+	    /// <param name="clientSpan"></param>
+	    /// <param name="statusCode"></param>
+	    /// <param name="errorMessage"></param>
+	    public void EndClientTrace(Span clientSpan, int statusCode, string errorMessage = null)
         {
             if (string.IsNullOrEmpty(clientSpan?.TraceId))
                 return;
 
             try
             {
-                _spanTracer.ReceiveClientSpan(clientSpan, statusCode);
+                _spanTracer.ReceiveClientSpan(clientSpan, statusCode, errorMessage);
             }
             catch (Exception ex)
             {
@@ -121,18 +123,20 @@ namespace ZipkinTracer
             }
         }
 
-        /// <summary>
-        /// End server trace
-        /// </summary>
-        /// <param name="serverSpan"></param>
-        public void EndServerTrace(Span serverSpan)
+	    /// <summary>
+	    /// End server trace
+	    /// </summary>
+	    /// <param name="serverSpan"></param>
+	    /// <param name="statusCode"></param>
+	    /// <param name="errorMessage"></param>
+	    public void EndServerTrace(Span serverSpan, int statusCode, string errorMessage = null)
         {
 			if (string.IsNullOrEmpty(serverSpan?.TraceId))
 				return;
 
 			try
             {
-                _spanTracer.SendServerSpan(serverSpan);
+                _spanTracer.SendServerSpan(serverSpan, statusCode, errorMessage);
             }
             catch (Exception ex)
             {
@@ -202,7 +206,7 @@ namespace ZipkinTracer
 
 			try
             {
-                await _spanTracer.RecordBinary(span, ZipkinConstants.LocalComponent, value);
+                await _spanTracer.RecordBinary(span, TraceKeys.LocalComponent, value);
             }
             catch (Exception ex)
             {
