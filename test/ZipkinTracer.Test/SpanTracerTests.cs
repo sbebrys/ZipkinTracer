@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using NUnit.Framework;
+using ZipkinTracer.Extensions;
 using ZipkinTracer.Internal;
 using ZipkinTracer.Models;
 using ZipkinTracer.Models.References;
@@ -54,7 +55,7 @@ namespace ZipkinTracer.Test
 
             var annotation = resultSpan.Annotations[0] as Annotation;
             Assert.IsNotNull(annotation);
-            Assert.AreEqual(ZipkinConstants.ServerReceive, annotation.Value);
+            Assert.AreEqual(TraceKeys.ServerRecv, annotation.Value);
             Assert.IsNotNull(annotation.Timestamp);
             Assert.IsNotNull(annotation.Host);
 

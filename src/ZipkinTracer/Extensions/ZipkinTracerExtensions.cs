@@ -4,11 +4,13 @@ using System.Linq;
 using ZipkinTracer.Models;
 using ZipkinTracer.Models.References;
 
-namespace ZipkinTracer
+namespace ZipkinTracer.Extensions
 {
     public static class ZipkinTracerExtensions
     {
-        private static readonly Dictionary<Type, AnnotationType> AnnotationTypeMappings =
+		private const long TicksPerMicrosecond = 10;
+
+		private static readonly Dictionary<Type, AnnotationType> AnnotationTypeMappings =
             new Dictionary<Type, AnnotationType>()
             {
                 { typeof(bool), AnnotationType.Boolean },
@@ -31,11 +33,11 @@ namespace ZipkinTracer
             return span.Annotations.OfType<TAnnotation>();
         }
 
-        public static long ToUnixTimeMicroseconds(this DateTimeOffset value)
+		public static long ToUnixTimeMicroseconds(this DateTime value)
         {
             return Convert.ToInt64(
-                (value - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalMilliseconds * 1000
-            );
+                (value - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).Ticks / TicksPerMicrosecond
+			);
         }
     }
 }

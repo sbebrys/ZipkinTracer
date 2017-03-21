@@ -7,13 +7,13 @@ namespace ZipkinTracer
 {
     public interface IZipkinTracer
     {
-        Task<Span> StartServerTrace(Uri requestUri, string methodName);
+        Task<Span> StartServerTrace(Uri requestUri, string spanName);
 
-        Task<Span> StartClientTrace(Uri remoteUri, string methodName, TraceInfo traceInfo);
+        Task<Span> StartClientTrace(Uri remoteUri, string spanName, TraceInfo traceInfo);
 
-        void EndServerTrace(Span serverSpan);
+        void EndServerTrace(Span serverSpan, int statusCode, string errorMessage = null);
 
-        void EndClientTrace(Span clientSpan, int statusCode);
+        void EndClientTrace(Span clientSpan, int statusCode, string errorMessage = null);
 
         Task Record(Span span, [CallerMemberName] string value = null);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using ZipkinTracer.Extensions;
 
 namespace ZipkinTracer.Models.Serialization.Json
 {
