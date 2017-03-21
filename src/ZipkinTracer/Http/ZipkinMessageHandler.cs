@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ZipkinTracer.Internal;
@@ -38,9 +39,14 @@ namespace ZipkinTracer.Http
             var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
             // end record span
-            _client.EndClientTrace(span, (int)response.StatusCode, response.IsSuccessStatusCode ? null : response.StatusCode.ToString());
+            _client.EndClientTrace(span, (int)response.StatusCode, IsErrorStatusCode(response.StatusCode) ? response.StatusCode.ToString() : null);
 
             return response;
         }
-    }
+
+		private static bool IsErrorStatusCode(HttpStatusCode statusCode)
+		{
+			return (int)statusCode >= 400 && (int)statusCode <= 599;
+		}
+	}
 }
