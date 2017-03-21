@@ -107,6 +107,7 @@ namespace ZipkinTracer.Internal
 			var annotation = new Annotation
 			{
 				Host = span.Annotations.First().Host,
+				Value = TraceKeys.ClientRecv
 			};
 
 			span.Annotations.Add(annotation);
