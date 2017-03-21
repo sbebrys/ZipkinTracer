@@ -51,7 +51,7 @@ namespace ZipkinTracer.Owin
 					var httpResponse = response as HttpResponse;
 					if(httpResponse != null)
 					{
-						traceClient.EndServerTrace(span, httpResponse.StatusCode, IsSuccessStatusCode(httpResponse.StatusCode) ? null : ((HttpStatusCode)httpResponse.StatusCode).ToString());
+						traceClient.EndServerTrace(span, httpResponse.StatusCode, IsErrorStatusCode(httpResponse.StatusCode) ? ((HttpStatusCode)httpResponse.StatusCode).ToString() : null);
 					}
 					return Task.CompletedTask;
 				}, context.Response);
@@ -76,9 +76,9 @@ namespace ZipkinTracer.Owin
             _traceInfoAccessor.TraceInfo = new TraceInfo(traceId, spanId, parentSpanId, isSampled, domain);
         }
 
-		private static bool IsSuccessStatusCode(int statusCode)
+		private static bool IsErrorStatusCode(int statusCode)
 		{
-			return statusCode >= 200 && statusCode <= 299;
+			return statusCode >= 400 && statusCode <= 599;
 		}
 	}
 
