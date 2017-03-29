@@ -42,8 +42,11 @@ namespace ZipkinTracer.Owin
                 return;
             }
 
+			string headerSpanName = context.Request.Headers[TraceInfo.SpanNameHeaderName];
+
+			var spanName = !string.IsNullOrEmpty(headerSpanName) ? headerSpanName : $"{context.Request.Method} {context.Request.Path}";
 			var traceClient = context.RequestServices.GetRequiredService<IZipkinTracer>();
-            var span = await traceClient.StartServerTrace(new Uri(context.Request.GetEncodedUrl()), $"{context.Request.Method} {context.Request.Path}");
+			var span = await traceClient.StartServerTrace(new Uri(context.Request.GetEncodedUrl()), spanName);
 
 			context.Response.OnStarting(
 				response =>
@@ -73,7 +76,7 @@ namespace ZipkinTracer.Owin
             var isSampled = _zipkinConfig.ShouldBeSampled(headerSampled, requestPath);
             var domain = _zipkinConfig.Domain(context.Request);
 
-            _traceInfoAccessor.TraceInfo = new TraceInfo(traceId, spanId, parentSpanId, isSampled, domain);
+            _traceInfoAccessor.TraceInfo = new TraceInfo(traceId, spanId, isSampled, domain, parentSpanId);
         }
 
 		private static bool IsErrorStatusCode(int statusCode)
