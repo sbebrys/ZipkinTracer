@@ -10,6 +10,7 @@ namespace ZipkinTracer.Models
         public const string ParentSpanIdHeaderName = "X-B3-ParentSpanId";
         public const string SampledHeaderName = "X-B3-Sampled";
         public const string SpanNameHeaderName = "X-Span-Name";
+        public const string TraceInfoKey = "TraceInfo";
 
         public string TraceId { get; }
         public string SpanId { get; }

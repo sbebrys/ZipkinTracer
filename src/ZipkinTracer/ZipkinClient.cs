@@ -50,15 +50,17 @@ namespace ZipkinTracer
 			if(_traceInfoAccessor.TraceInfo == null)
 				return Task.FromResult<Span>(null);
 
+            // new trace info
 			var traceInfo = new TraceInfo(_traceInfoAccessor.TraceInfo);
 
-			if (!traceInfo.IsTraceOn || !_zipkinConfig.Enabled || string.IsNullOrEmpty(methodName))
+            // set in current context
+            _traceInfoAccessor.TraceInfo = traceInfo;
+
+            if (!traceInfo.IsTraceOn || !_zipkinConfig.Enabled || string.IsNullOrEmpty(methodName))
                 return Task.FromResult<Span>(null);
 
             try
             {
-	            _traceInfoAccessor.TraceInfo = traceInfo;
-
 				return _spanTracer.SendClientSpan(methodName.ToLower(), traceInfo, remoteUri);
             }
             catch (Exception ex)
@@ -76,16 +78,20 @@ namespace ZipkinTracer
 	    /// <param name="errorMessage"></param>
 	    public void EndClientTrace(Span clientSpan, int statusCode, string errorMessage = null)
         {
-            if (string.IsNullOrEmpty(clientSpan?.TraceId))
-                return;
-
             try
             {
+                if (string.IsNullOrEmpty(clientSpan?.TraceId))
+                    return;
+
                 _spanTracer.ReceiveClientSpan(clientSpan, statusCode, errorMessage);
             }
             catch (Exception ex)
             {
                 _logger.LogError(new EventId(0), ex, "Error Ending Client Trace");
+            }
+            finally
+            {
+                _traceInfoAccessor.TraceInfo = _traceInfoAccessor.TraceInfo?.ParentTraceInfo;
             }
         }
 
@@ -126,8 +132,6 @@ namespace ZipkinTracer
 
 			try
 			{
-				_traceInfoAccessor.TraceInfo = _traceInfoAccessor.TraceInfo?.ParentTraceInfo;
-
 				_spanTracer.SendServerSpan(serverSpan, statusCode, errorMessage);
             }
             catch (Exception ex)
