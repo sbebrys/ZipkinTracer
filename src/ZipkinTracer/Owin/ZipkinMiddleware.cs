@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using ZipkinTracer.Internal;
 using ZipkinTracer.Http;
@@ -42,8 +44,11 @@ namespace ZipkinTracer.Owin
                 return;
             }
 
+			string headerSpanName = context.Request.Headers[TraceInfo.SpanNameHeaderName];
+
+			var spanName = !string.IsNullOrEmpty(headerSpanName) ? headerSpanName : $"{context.Request.Method} {context.Request.Path}";
 			var traceClient = context.RequestServices.GetRequiredService<IZipkinTracer>();
-            var span = await traceClient.StartServerTrace(new Uri(context.Request.GetEncodedUrl()), $"{context.Request.Method} {context.Request.Path}");
+			var span = await traceClient.StartServerTrace(new Uri(context.Request.GetEncodedUrl()), spanName);
 
 			context.Response.OnStarting(
 				response =>
@@ -72,8 +77,11 @@ namespace ZipkinTracer.Owin
             var parentSpanId = headerParentSpanId.IsParsableToLong() ? headerParentSpanId : string.Empty;
             var isSampled = _zipkinConfig.ShouldBeSampled(headerSampled, requestPath);
             var domain = _zipkinConfig.Domain(context.Request);
+            
+            var traceInfo = new TraceInfo(traceId, spanId, isSampled, domain, parentSpanId);
+            _traceInfoAccessor.TraceInfo = traceInfo;
 
-            _traceInfoAccessor.TraceInfo = new TraceInfo(traceId, spanId, parentSpanId, isSampled, domain);
+            context.Items[TraceInfo.TraceInfoKey] = traceInfo;
         }
 
 		private static bool IsErrorStatusCode(int statusCode)

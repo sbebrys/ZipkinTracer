@@ -9,7 +9,7 @@ namespace ZipkinTracer
     {
         Task<Span> StartServerTrace(Uri requestUri, string spanName);
 
-        Task<Span> StartClientTrace(Uri remoteUri, string spanName, TraceInfo traceInfo);
+        Task<Span> StartClientTrace(Uri remoteUri, string spanName);
 
         void EndServerTrace(Span serverSpan, int statusCode, string errorMessage = null);
 
@@ -21,6 +21,6 @@ namespace ZipkinTracer
 
         Task RecordLocalComponent(Span span, string value);
 
-        TraceInfo CreateInnerSpan();
+	    TraceInfo GetCurrentTraceInfo();
     }
 }

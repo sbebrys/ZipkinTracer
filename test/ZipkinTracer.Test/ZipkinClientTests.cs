@@ -37,7 +37,7 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-            traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo(string.Empty, string.Empty, string.Empty, true, null));
+            traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo(string.Empty, string.Empty, true, null, string.Empty));
 
             var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
@@ -54,7 +54,7 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo(string.Empty, string.Empty, string.Empty, false, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo(string.Empty, string.Empty, false, null, string.Empty));
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
@@ -71,7 +71,7 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, true, null, string.Empty));
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
@@ -88,7 +88,7 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, true, null, string.Empty));
 
             spanTracer.ReceiveServerSpan(null, null, null).ReturnsForAnyArgs(span);
 
@@ -105,7 +105,7 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, true, null, string.Empty));
 
 			spanTracer.WhenForAnyArgs(x => x.ReceiveServerSpan(null, null, null)).Throw<Exception>();
 
@@ -122,14 +122,13 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo(null, string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo(null, string.Empty, true, null, string.Empty));
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
-            Assert.IsNull(await zipkinClient.StartClientTrace(null, null, null));
-            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), null, null));
-            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST", null));
-            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST", traceInfoAccessor.TraceInfo));
+            Assert.IsNull(await zipkinClient.StartClientTrace(null, null));
+            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), null));
+            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST"));
         }
 
         [Test]
@@ -140,14 +139,13 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo(null, string.Empty, string.Empty, false, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo(null, string.Empty, false, null, string.Empty));
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
-            Assert.IsNull(await zipkinClient.StartClientTrace(null, null, null));
-            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), null, null));
-            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST", null));
-            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST", traceInfoAccessor.TraceInfo));
+            Assert.IsNull(await zipkinClient.StartClientTrace(null, null));
+            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), null));
+            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST"));
         }
 
         [Test]
@@ -159,13 +157,13 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, true, null, string.Empty));
 
 			spanTracer.SendClientSpan(null, null, null).ReturnsForAnyArgs(span);
 
             var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
-            Assert.AreSame(await zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST", traceInfoAccessor.TraceInfo), span);
+            Assert.AreSame(await zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST"), span);
         }
 
         [Test]
@@ -176,11 +174,11 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, true, null, string.Empty));
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
-            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST", null));
+            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST"));
         }
 
         [Test]
@@ -191,12 +189,11 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, true, null, string.Empty));
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
-            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), null, null));
-            Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), null, traceInfoAccessor.TraceInfo));
+	        Assert.IsNull(await zipkinClient.StartClientTrace(new Uri("http://localhost"), null));
         }
 
         [Test]
@@ -207,13 +204,13 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, true, null, string.Empty));
 
 			spanTracer.WhenForAnyArgs(x => x.SendClientSpan(null, null, null)).Throw<Exception>();
 
             var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
-            Assert.DoesNotThrowAsync(() => zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST", traceInfoAccessor.TraceInfo));
+            Assert.DoesNotThrowAsync(() => zipkinClient.StartClientTrace(new Uri("http://localhost"), "POST"));
         }
 
         [Test]
@@ -224,7 +221,7 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, true, null, string.Empty));
 
 			spanTracer.WhenForAnyArgs(x => x.SendServerSpan(null, 0)).Throw<Exception>();
 
@@ -241,7 +238,7 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, false, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, false, null, string.Empty));
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
@@ -259,7 +256,7 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, false, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, false, null, string.Empty));
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
 
@@ -276,7 +273,7 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, true, null, string.Empty));
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
             zipkinClient.EndServerTrace(null, 200);
@@ -324,7 +321,7 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, true, null, string.Empty));
 
 			spanTracer.WhenForAnyArgs(x => x.ReceiveClientSpan(null, 0)).Throw<Exception>();
 
@@ -341,7 +338,7 @@ namespace ZipkinTracer.Test
             var spanTracer = Substitute.For<ISpanTracer>();
             var logger = Substitute.For<ILogger<ZipkinClient>>();
 
-			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, string.Empty, true, null));
+			traceInfoAccessor.TraceInfo.Returns(ci => new TraceInfo("traceId", string.Empty, true, null, string.Empty));
 
 			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
             zipkinClient.EndClientTrace(null, 0);
@@ -461,27 +458,5 @@ namespace ZipkinTracer.Test
 
             await spanTracer.DidNotReceiveWithAnyArgs().RecordBinary(null, null, null);
         }
-
-        [Test]
-        public void GetNextTrace_Return_NextTrace()
-        {
-            var zipkinConfig = new ZipkinConfig(new Uri("http://localhost"));
-            var traceInfoAccessor = Substitute.For<ITraceInfoAccessor>();
-            var spanTracer = Substitute.For<ISpanTracer>();
-            var logger = Substitute.For<ILogger<ZipkinClient>>();
-
-	        var traceInfo = new TraceInfo("traceId", "spanId", "parentSpanId", true, new Uri("http://localhost"));
-			traceInfoAccessor.TraceInfo.Returns(ci => traceInfo);
-
-			var zipkinClient = new ZipkinClient(zipkinConfig, traceInfoAccessor, spanTracer, logger);
-            var innerSpanTraceInfo = zipkinClient.CreateInnerSpan();
-
-            Assert.AreEqual(traceInfo.TraceId, innerSpanTraceInfo.TraceId);
-            Assert.AreEqual(traceInfo.SpanId, innerSpanTraceInfo.ParentSpanId);
-            Assert.AreEqual(traceInfo.Domain, innerSpanTraceInfo.Domain);
-            Assert.AreEqual(traceInfo.IsSampled, innerSpanTraceInfo.IsSampled);
-			Assert.IsNotEmpty(innerSpanTraceInfo.SpanId);
-			Assert.AreNotEqual(traceInfo.SpanId, innerSpanTraceInfo.SpanId);
-		}
     }
 }

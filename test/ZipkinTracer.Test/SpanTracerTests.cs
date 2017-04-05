@@ -43,7 +43,7 @@ namespace ZipkinTracer.Test
             zipkinEndpoint.GetLocalEndpoint(null, 0).ReturnsForAnyArgs(localEndpoint);
 
             var st = new SpanTracer(zipkinConfig, spanCollector, zipkinEndpoint);
-			var trInfo = new TraceInfo(traceId, spanId, parentSpanId, true, new Uri("http://localhost"));
+			var trInfo = new TraceInfo(traceId, spanId, true, new Uri("http://localhost"), parentSpanId);
             var resultSpan = await st.ReceiveServerSpan(requestName, trInfo, requestUri);
 
             Assert.AreEqual(requestName, resultSpan.Name);
@@ -83,7 +83,7 @@ namespace ZipkinTracer.Test
             zipkinEndpoint.GetLocalEndpoint(null, 0).ReturnsForAnyArgs(localEndpoint);
 
             var st = new SpanTracer(zipkinConfig, spanCollector, zipkinEndpoint);
-			var trInfo = new TraceInfo(traceId, parentSpanId, spanId, true, new Uri("http://localhost"));
+			var trInfo = new TraceInfo(traceId, spanId, true, new Uri("http://localhost"), parentSpanId);
 			var resultSpan = await st.ReceiveServerSpan(requestName, trInfo, requestUri);
             var annotation = resultSpan.Annotations[0] as Annotation;
 

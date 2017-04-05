@@ -44,38 +44,30 @@ namespace ZipkinTracer
         /// </summary>
         /// <param name="remoteUri"></param>
         /// <param name="methodName"></param>
-        /// <param name="traceInfo"></param>
         /// <returns>Span of client trace</returns>
-        public Task<Span> StartClientTrace(Uri remoteUri, string methodName, TraceInfo traceInfo)
+        public Task<Span> StartClientTrace(Uri remoteUri, string methodName)
         {
-            if (traceInfo == null || !traceInfo.IsTraceOn || !_zipkinConfig.Enabled || string.IsNullOrEmpty(methodName))
+			if(_traceInfoAccessor.TraceInfo == null)
+				return Task.FromResult<Span>(null);
+
+            // new trace info
+			var traceInfo = new TraceInfo(_traceInfoAccessor.TraceInfo);
+
+            // set in current context
+            _traceInfoAccessor.TraceInfo = traceInfo;
+
+            if (!traceInfo.IsTraceOn || !_zipkinConfig.Enabled || string.IsNullOrEmpty(methodName))
                 return Task.FromResult<Span>(null);
 
             try
             {
-                return _spanTracer.SendClientSpan(methodName.ToLower(), traceInfo, remoteUri);
+				return _spanTracer.SendClientSpan(methodName.ToLower(), traceInfo, remoteUri);
             }
             catch (Exception ex)
             {
                 _logger.LogError(new EventId(0), ex, "Error Starting Client Trace");
                 return Task.FromResult<Span>(null);
             }
-        }
-
-        /// <summary>
-        /// Create inner trace span
-        /// </summary>
-        /// <returns>TraceInfo of new inner span</returns>
-        public TraceInfo CreateInnerSpan()
-        {
-            var traceInfo = _traceInfoAccessor.TraceInfo;
-
-            return new TraceInfo(
-                traceInfo.TraceId,
-				TraceIdHelper.GenerateHexEncodedInt64Id(),
-                traceInfo.SpanId,
-                traceInfo.IsSampled, 
-                traceInfo.Domain);
         }
 
 	    /// <summary>
@@ -86,16 +78,20 @@ namespace ZipkinTracer
 	    /// <param name="errorMessage"></param>
 	    public void EndClientTrace(Span clientSpan, int statusCode, string errorMessage = null)
         {
-            if (string.IsNullOrEmpty(clientSpan?.TraceId))
-                return;
-
             try
             {
+                if (string.IsNullOrEmpty(clientSpan?.TraceId))
+                    return;
+
                 _spanTracer.ReceiveClientSpan(clientSpan, statusCode, errorMessage);
             }
             catch (Exception ex)
             {
                 _logger.LogError(new EventId(0), ex, "Error Ending Client Trace");
+            }
+            finally
+            {
+                _traceInfoAccessor.TraceInfo = _traceInfoAccessor.TraceInfo?.ParentTraceInfo;
             }
         }
 
@@ -135,8 +131,8 @@ namespace ZipkinTracer
 				return;
 
 			try
-            {
-                _spanTracer.SendServerSpan(serverSpan, statusCode, errorMessage);
+			{
+				_spanTracer.SendServerSpan(serverSpan, statusCode, errorMessage);
             }
             catch (Exception ex)
             {
@@ -213,5 +209,15 @@ namespace ZipkinTracer
                 _logger.LogError(new EventId(0), ex, $"Error recording local trace (value: {value})");
             }
         }
-    }
+
+	    internal TraceInfo GetCurrentTraceInfo()
+	    {
+		    return _traceInfoAccessor.TraceInfo;
+	    }
+
+		TraceInfo IZipkinTracer.GetCurrentTraceInfo()
+		{
+			return GetCurrentTraceInfo();
+		}
+	}
 }
