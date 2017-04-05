@@ -37,6 +37,8 @@ namespace ZipkinTracer.Http
 				request.Headers.Add(TraceInfo.ParentSpanIdHeaderName, traceInfo.ParentSpanId);
 				request.Headers.Add(TraceInfo.SampledHeaderName, traceInfo.IsSampled.ToString());
 
+				request.Properties[TraceInfo.TraceInfoKey] = traceInfo;
+
 				var response = await base.SendAsync(request, cancellationToken);
 
 				// end record span
