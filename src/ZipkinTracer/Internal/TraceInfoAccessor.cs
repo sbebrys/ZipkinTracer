@@ -9,15 +9,9 @@ namespace ZipkinTracer.Internal
 
         public TraceInfo TraceInfo
         {
-            get
-            {
-                return TraceInfoCurrent.Value;
-            }
+            get { return TraceInfoCurrent.Value; }
 
-            set
-            {
-				TraceInfoCurrent.Value = value;
-            }
+            set { TraceInfoCurrent.Value = value; }
         }
     }
 }

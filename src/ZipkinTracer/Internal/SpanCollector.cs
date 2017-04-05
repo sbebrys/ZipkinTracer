@@ -24,7 +24,7 @@ namespace ZipkinTracer.Internal
 
         public bool TryTake(out Span span)
         {
-           return _spanQueue.TryTake(out span);
+            return _spanQueue.TryTake(out span);
         }
     }
 }

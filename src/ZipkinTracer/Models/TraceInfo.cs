@@ -14,12 +14,12 @@ namespace ZipkinTracer.Models
 
         public string TraceId { get; }
         public string SpanId { get; }
-	    public string ParentSpanId => ParentTraceInfo?.SpanId;
-		public Uri Domain { get; }
+        public string ParentSpanId => ParentTraceInfo?.SpanId;
+        public Uri Domain { get; }
         public bool IsSampled { get; }
-		public TraceInfo ParentTraceInfo { get; }
+        public TraceInfo ParentTraceInfo { get; }
 
-		public bool IsTraceOn => !string.IsNullOrEmpty(TraceId) && IsSampled;
+        public bool IsTraceOn => !string.IsNullOrEmpty(TraceId) && IsSampled;
 
         public TraceInfo(string traceId, string spanId, bool isSampled, Uri domain, string parentSpanId = null)
         {
@@ -28,18 +28,18 @@ namespace ZipkinTracer.Models
             IsSampled = isSampled;
             Domain = domain;
 
-	        if (!string.IsNullOrEmpty(parentSpanId))
-	        {
-				ParentTraceInfo = new TraceInfo(traceId, parentSpanId, isSampled, domain);
-			}
+            if (!string.IsNullOrEmpty(parentSpanId))
+            {
+                ParentTraceInfo = new TraceInfo(traceId, parentSpanId, isSampled, domain);
+            }
         }
 
         public TraceInfo(TraceInfo parentTraceInfo)
-		{
-			ParentTraceInfo = parentTraceInfo;
-			TraceId = parentTraceInfo?.TraceId;
+        {
+            ParentTraceInfo = parentTraceInfo;
+            TraceId = parentTraceInfo?.TraceId;
             SpanId = TraceIdHelper.GenerateHexEncodedInt64Id();
-			IsSampled = parentTraceInfo?.IsSampled ?? false;
+            IsSampled = parentTraceInfo?.IsSampled ?? false;
             Domain = parentTraceInfo?.Domain;
         }
     }

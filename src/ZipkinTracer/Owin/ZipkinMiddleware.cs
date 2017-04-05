@@ -20,7 +20,7 @@ namespace ZipkinTracer.Owin
         private readonly ZipkinConfig _zipkinConfig;
         private readonly ITraceInfoAccessor _traceInfoAccessor;
 
-        public ZipkinMiddleware(RequestDelegate next, ISpanProcessor spanProcessor, 
+        public ZipkinMiddleware(RequestDelegate next, ISpanProcessor spanProcessor,
             ZipkinConfig zipkinConfig, ITraceInfoAccessor traceInfoAccessor)
         {
             if (spanProcessor == null) throw new ArgumentNullException(nameof(spanProcessor));
@@ -44,22 +44,27 @@ namespace ZipkinTracer.Owin
                 return;
             }
 
-			string headerSpanName = context.Request.Headers[TraceInfo.SpanNameHeaderName];
+            string headerSpanName = context.Request.Headers[TraceInfo.SpanNameHeaderName];
 
-			var spanName = !string.IsNullOrEmpty(headerSpanName) ? headerSpanName : $"{context.Request.Method} {context.Request.Path}";
-			var traceClient = context.RequestServices.GetRequiredService<IZipkinTracer>();
-			var span = await traceClient.StartServerTrace(new Uri(context.Request.GetEncodedUrl()), spanName);
+            var spanName = !string.IsNullOrEmpty(headerSpanName)
+                ? headerSpanName
+                : $"{context.Request.Method} {context.Request.Path}";
+            var traceClient = context.RequestServices.GetRequiredService<IZipkinTracer>();
+            var span = await traceClient.StartServerTrace(new Uri(context.Request.GetEncodedUrl()), spanName);
 
-			context.Response.OnStarting(
-				response =>
-				{
-					var httpResponse = response as HttpResponse;
-					if(httpResponse != null)
-					{
-						traceClient.EndServerTrace(span, httpResponse.StatusCode, IsErrorStatusCode(httpResponse.StatusCode) ? ((HttpStatusCode)httpResponse.StatusCode).ToString() : null);
-					}
-					return Task.CompletedTask;
-				}, context.Response);
+            context.Response.OnStarting(
+                response =>
+                {
+                    var httpResponse = response as HttpResponse;
+                    if (httpResponse != null)
+                    {
+                        traceClient.EndServerTrace(span, httpResponse.StatusCode,
+                            IsErrorStatusCode(httpResponse.StatusCode)
+                                ? ((HttpStatusCode) httpResponse.StatusCode).ToString()
+                                : null);
+                    }
+                    return Task.CompletedTask;
+                }, context.Response);
 
             await _next(context);
         }
@@ -71,24 +76,26 @@ namespace ZipkinTracer.Owin
             string headerParentSpanId = context.Request.Headers[TraceInfo.ParentSpanIdHeaderName];
             string headerSampled = context.Request.Headers[TraceInfo.SampledHeaderName];
             var requestPath = context.Request.Path.ToString();
-        
-            var traceId = headerTraceId.IsParsableTo128Or64Bit() ? headerTraceId : TraceIdHelper.GenerateNewTraceId(_zipkinConfig.Create128BitTraceId);
+
+            var traceId = headerTraceId.IsParsableTo128Or64Bit()
+                ? headerTraceId
+                : TraceIdHelper.GenerateNewTraceId(_zipkinConfig.Create128BitTraceId);
             var spanId = headerSpanId.IsParsableToLong() ? headerSpanId : TraceIdHelper.GenerateHexEncodedInt64Id();
             var parentSpanId = headerParentSpanId.IsParsableToLong() ? headerParentSpanId : string.Empty;
             var isSampled = _zipkinConfig.ShouldBeSampled(headerSampled, requestPath);
             var domain = _zipkinConfig.Domain(context.Request);
-            
+
             var traceInfo = new TraceInfo(traceId, spanId, isSampled, domain, parentSpanId);
             _traceInfoAccessor.TraceInfo = traceInfo;
 
             context.Items[TraceInfo.TraceInfoKey] = traceInfo;
         }
 
-		private static bool IsErrorStatusCode(int statusCode)
-		{
-			return statusCode >= 400 && statusCode <= 599;
-		}
-	}
+        private static bool IsErrorStatusCode(int statusCode)
+        {
+            return statusCode >= 400 && statusCode <= 599;
+        }
+    }
 
     public static class AppBuilderExtensions
     {

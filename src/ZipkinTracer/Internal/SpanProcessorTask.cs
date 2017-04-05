@@ -21,8 +21,8 @@ namespace ZipkinTracer.Internal
 
         public SpanProcessorTask(ZipkinConfig zipkinConfig, ILogger<SpanProcessorTask> logger)
         {
-            if(zipkinConfig == null) throw new ArgumentNullException(nameof(zipkinConfig));
-            if(logger == null) throw new ArgumentNullException(nameof(logger));
+            if (zipkinConfig == null) throw new ArgumentNullException(nameof(zipkinConfig));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             _logger = logger;
             _zipkinConfig = zipkinConfig;
@@ -32,14 +32,21 @@ namespace ZipkinTracer.Internal
         public void Start(Func<Task> asyncAction)
         {
             if (asyncAction != null)
-            { 
-                SyncHelper.ExecuteSafely(_sync, () => _taskInstance == null || _taskInstance.Status == TaskStatus.Faulted, () => { _taskInstance = Task.Factory.StartNew(() => TaskExecuteLoop(asyncAction), _cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default); });
+            {
+                SyncHelper.ExecuteSafely(_sync,
+                    () => _taskInstance == null || _taskInstance.Status == TaskStatus.Faulted,
+                    () =>
+                    {
+                        _taskInstance = Task.Factory.StartNew(() => TaskExecuteLoop(asyncAction),
+                            _cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                    });
             }
         }
 
         public void Stop()
         {
-            SyncHelper.ExecuteSafely(_sync, () => _cancellationTokenSource.Token.CanBeCanceled, () => _cancellationTokenSource.Cancel());
+            SyncHelper.ExecuteSafely(_sync, () => _cancellationTokenSource.Token.CanBeCanceled,
+                () => _cancellationTokenSource.Cancel());
         }
 
         private async Task TaskExecuteLoop(Func<Task> asyncAction)

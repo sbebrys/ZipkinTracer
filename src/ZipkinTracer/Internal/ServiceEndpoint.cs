@@ -35,7 +35,7 @@ namespace ZipkinTracer.Internal
             {
                 ServiceName = remoteServiceName,
                 IPAddress = await GetRemoteIPAddress(remoteServer),
-                Port = (ushort)remoteServer.Port
+                Port = (ushort) remoteServer.Port
             };
         }
 

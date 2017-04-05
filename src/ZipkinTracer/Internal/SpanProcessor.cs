@@ -32,7 +32,8 @@ namespace ZipkinTracer.Internal
 
         public bool IsStarted { get; private set; }
 
-        public SpanProcessor(ISpanProcessorTask spanProcessorTask, ISpanCollector spanCollector, ZipkinConfig zipkinConfig, ILogger<SpanProcessor> logger)
+        public SpanProcessor(ISpanProcessorTask spanProcessorTask, ISpanCollector spanCollector,
+            ZipkinConfig zipkinConfig, ILogger<SpanProcessor> logger)
         {
             if (spanProcessorTask == null) throw new ArgumentNullException(nameof(spanProcessorTask));
             if (spanCollector == null) throw new ArgumentNullException(nameof(spanCollector));
@@ -48,12 +49,21 @@ namespace ZipkinTracer.Internal
 
         public Task Stop()
         {
-            return SyncHelper.ExecuteSafelyAsync(_syncObj, () => IsStarted, () => { _spanProcessorTask.Stop(); IsStarted = false; return LogSubmittedSpans(); });
+            return SyncHelper.ExecuteSafelyAsync(_syncObj, () => IsStarted, () =>
+            {
+                _spanProcessorTask.Stop();
+                IsStarted = false;
+                return LogSubmittedSpans();
+            });
         }
 
         public Task Start()
         {
-            SyncHelper.ExecuteSafely(_syncObj, () => !IsStarted, () => { _spanProcessorTask.Start(LogSubmittedSpans); IsStarted = true; });
+            SyncHelper.ExecuteSafely(_syncObj, () => !IsStarted, () =>
+            {
+                _spanProcessorTask.Start(LogSubmittedSpans);
+                IsStarted = true;
+            });
             return Task.CompletedTask;
         }
 
@@ -86,7 +96,8 @@ namespace ZipkinTracer.Internal
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        _logger.LogError("Failed to send spans to Zipkin server (HTTP status code returned: {0}). Response from server: {1}",
+                        _logger.LogError(
+                            "Failed to send spans to Zipkin server (HTTP status code returned: {0}). Response from server: {1}",
                             response.StatusCode, await response.Content.ReadAsStringAsync());
                     }
                 }
@@ -102,8 +113,8 @@ namespace ZipkinTracer.Internal
         {
             return _serializableSpans.Any() &&
                    (_serializableSpans.Count >= _zipkinConfig.SpanProcessorBatchSize
-                   || _spanProcessorTask.IsCancelled
-                   || _subsequentPollCount > MaxNumberOfPolls);
+                    || _spanProcessorTask.IsCancelled
+                    || _subsequentPollCount > MaxNumberOfPolls);
         }
 
         private bool ProcessQueuedSpans()

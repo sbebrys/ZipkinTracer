@@ -49,10 +49,7 @@ namespace ZipkinTracer
         /// </summary>
         public double SampleRate
         {
-            get
-            {
-                return _sampleRate;
-            }
+            get { return _sampleRate; }
             set
             {
                 if (value < 0)
@@ -90,7 +87,8 @@ namespace ZipkinTracer
         /// <param name="zipkinBaseUri">Zipkin serwer uri</param>
         /// <param name="excludedPathList">List of service path which will omit in tracing</param>
         /// <param name="notToBeDisplayedDomainList">List of domain which will be cut in reported annotations</param>
-        public ZipkinConfig(Uri zipkinBaseUri, IList<string> excludedPathList = null, IList<string> notToBeDisplayedDomainList = null)
+        public ZipkinConfig(Uri zipkinBaseUri, IList<string> excludedPathList = null,
+            IList<string> notToBeDisplayedDomainList = null)
         {
             if (zipkinBaseUri == null) throw new ArgumentNullException(nameof(zipkinBaseUri));
 
@@ -106,11 +104,12 @@ namespace ZipkinTracer
         /// <param name="domainResolverFunc">Domain name resolver</param>
         /// <param name="excludedPathList">List of service path which will omit in tracing</param>
         /// <param name="notToBeDisplayedDomainList">List of domain which will be cut in reported annotations</param>
-        public ZipkinConfig(Uri zipkinBaseUri, Func<HttpRequest, Uri> domainResolverFunc, IList<string> excludedPathList = null, IList<string> notToBeDisplayedDomainList = null)
+        public ZipkinConfig(Uri zipkinBaseUri, Func<HttpRequest, Uri> domainResolverFunc,
+            IList<string> excludedPathList = null, IList<string> notToBeDisplayedDomainList = null)
         {
             if (zipkinBaseUri == null) throw new ArgumentNullException(nameof(zipkinBaseUri));
             if (domainResolverFunc == null) throw new ArgumentNullException(nameof(domainResolverFunc));
-            
+
             ZipkinBaseUri = zipkinBaseUri;
             Domain = domainResolverFunc;
             ExcludedPathList = excludedPathList ?? new List<string>();
@@ -129,13 +128,14 @@ namespace ZipkinTracer
             if (TryParseSampledFlagToBool(sampledFlag, out result)) return result;
 
             if (IsInDontSampleList(requestPath)) return false;
-            
+
             return _random.NextDouble() <= SampleRate;
         }
 
         private bool IsInDontSampleList(string path)
         {
-	        return path != null && ExcludedPathList.Any(uri => path.StartsWith(uri, StringComparison.CurrentCultureIgnoreCase));
+            return path != null &&
+                   ExcludedPathList.Any(uri => path.StartsWith(uri, StringComparison.CurrentCultureIgnoreCase));
         }
 
         private bool TryParseSampledFlagToBool(string sampledFlag, out bool booleanValue)

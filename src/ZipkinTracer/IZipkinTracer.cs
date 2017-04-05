@@ -21,6 +21,6 @@ namespace ZipkinTracer
 
         Task RecordLocalComponent(Span span, string value);
 
-	    TraceInfo GetCurrentTraceInfo();
+        TraceInfo GetCurrentTraceInfo();
     }
 }

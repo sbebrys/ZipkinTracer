@@ -35,7 +35,8 @@ namespace ZipkinTracer.Helpers
         internal static bool IsParsableToLong(this string value)
         {
             long result;
-            return !string.IsNullOrWhiteSpace(value) && long.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result);
+            return !string.IsNullOrWhiteSpace(value) &&
+                   long.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result);
         }
     }
 }

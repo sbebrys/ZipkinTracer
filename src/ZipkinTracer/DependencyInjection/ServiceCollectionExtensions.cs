@@ -14,7 +14,7 @@ namespace ZipkinTracer.DependencyInjection
 
         public static void AddZipkinTracer(this IServiceCollection services, ZipkinConfig config)
         {
-            if(config == null) throw new ArgumentNullException(nameof(config));
+            if (config == null) throw new ArgumentNullException(nameof(config));
 
             services.AddSingleton(config);
             services.AddSingleton(new BlockingCollection<Span>(MaxQueueSize));

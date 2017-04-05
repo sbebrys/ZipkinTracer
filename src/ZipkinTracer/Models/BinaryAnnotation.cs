@@ -3,7 +3,7 @@ using ZipkinTracer.Models.References;
 
 namespace ZipkinTracer.Models
 {
-    public class BinaryAnnotation: AnnotationBase
+    public class BinaryAnnotation : AnnotationBase
     {
         public string Key { get; set; }
 
