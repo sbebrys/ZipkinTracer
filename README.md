@@ -1,4 +1,4 @@
-# Medidata.ZipkinTracerModule
+# ZipkinTracer
 A .NET Core implementation of the Zipkin Tracer Client.
 
 ## Overview
