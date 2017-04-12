@@ -1,10 +1,10 @@
 {
 	"title": "ZipkinTracer",
 	"copyright": "Copyright © 2017 Cinkciarz.pl",
-	"authors": [ "Sebastian Bebrys", "Sebastian Pieniążek" ],
+	"authors": [ "Sebastian Bebrys" ],
 	
 	"description": ".Net Core Zipkin Tracer",
-	"version": "1.2.0",
+	"version": "1.2.1",
 
 	"dependencies": {
 		"Microsoft.AspNetCore.Http.Abstractions": "1.1.1",
