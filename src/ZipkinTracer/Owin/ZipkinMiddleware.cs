@@ -85,7 +85,7 @@ namespace ZipkinTracer.Owin
             var isSampled = _zipkinConfig.ShouldBeSampled(headerSampled, requestPath);
             var domain = _zipkinConfig.Domain(context.Request);
 
-            var traceInfo = new TraceInfo(traceId, spanId, isSampled, domain, parentSpanId);
+            var traceInfo = new TraceInfo(traceId, spanId, isSampled, domain, context.Connection.LocalIpAddress, parentSpanId);
             _traceInfoAccessor.TraceInfo = traceInfo;
 
             context.Items[TraceInfo.TraceInfoKey] = traceInfo;

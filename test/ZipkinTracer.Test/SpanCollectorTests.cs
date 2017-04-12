@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Net;
 using NUnit.Framework;
 using ZipkinTracer.Internal;
 using ZipkinTracer.Models;
@@ -32,7 +33,7 @@ namespace ZipkinTracer.Test
             var collection = new BlockingCollection<Span>();
             var collector = new SpanCollector(collection);
 
-            collector.Collect(new Span(string.Empty, string.Empty, string.Empty, string.Empty, null));
+            collector.Collect(new Span(string.Empty, string.Empty, string.Empty, string.Empty, null, IPAddress.Loopback));
 
             Assert.AreEqual(collection.Count, 1);
         }
@@ -53,7 +54,7 @@ namespace ZipkinTracer.Test
         [Test]
         public void TryTake_NotEmptyCollection_ReturnSpan()
         {
-	        var span = new Span(string.Empty, "TestSpanId", string.Empty, string.Empty, null);
+	        var span = new Span(string.Empty, "TestSpanId", string.Empty, string.Empty, null, IPAddress.Loopback);
 
 			var collection = new BlockingCollection<Span>();
             var collector = new SpanCollector(collection);
@@ -70,7 +71,7 @@ namespace ZipkinTracer.Test
         [Test]
         public void TryTake_NotEmptyCollection_ClearCollection()
         {
-            var span = new Span(string.Empty, "TestSpanId", string.Empty, string.Empty, null);;
+            var span = new Span(string.Empty, "TestSpanId", string.Empty, string.Empty, null, IPAddress.Loopback);
             var collection = new BlockingCollection<Span>();
             var collector = new SpanCollector(collection);
 

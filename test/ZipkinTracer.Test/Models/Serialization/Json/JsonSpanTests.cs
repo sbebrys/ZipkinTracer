@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using NSubstitute;
 using NUnit.Framework;
 using ZipkinTracer.Models;
@@ -14,7 +15,7 @@ namespace ZipkinTracer.Test.Models.Serialization.Json
         public void JsonSpan()
         {
             // Arrange
-	        var span = new Span("15", "cnk", "05", "123", new Uri("http://localhost"));
+	        var span = new Span("15", "cnk", "05", "123", new Uri("http://localhost"), IPAddress.Loopback);
 
             var annotation = Substitute.For<Annotation>();
             var binaryAnnotation = Substitute.For<BinaryAnnotation>();
@@ -40,7 +41,7 @@ namespace ZipkinTracer.Test.Models.Serialization.Json
         public void JsonSpan_ParentIdIsWhiteSpace()
         {
             // Arrange
-	        var span = new Span(string.Empty, string.Empty, string.Empty, string.Empty, null);
+	        var span = new Span(string.Empty, string.Empty, string.Empty, string.Empty, null, IPAddress.Loopback);
 
             // Act
             var result = new JsonSpan(span);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using ZipkinTracer.Internal;
@@ -16,7 +17,7 @@ namespace ZipkinTracer.Test
             ushort port = 12312;
 
             var zipkinEndpoint = new ServiceEndpoint();
-            var endpoint = await zipkinEndpoint.GetLocalEndpoint(serviceName, port);
+            var endpoint = await zipkinEndpoint.GetLocalEndpoint(serviceName, IPAddress.Loopback, port);
 
             Assert.IsNotNull(endpoint);
             Assert.AreEqual(serviceName, endpoint.ServiceName);
@@ -31,7 +32,7 @@ namespace ZipkinTracer.Test
             var serviceName = "name";
 
             var zipkinEndpoint = new ServiceEndpoint();
-            var endpoint = await zipkinEndpoint.GetRemoteEndpoint(remoteUri, serviceName);
+            var endpoint = await zipkinEndpoint.GetRemoteEndpoint(serviceName, remoteUri);
 
             Assert.IsNotNull(endpoint);
             Assert.AreEqual(serviceName, endpoint.ServiceName);

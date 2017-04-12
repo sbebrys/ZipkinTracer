@@ -9,33 +9,23 @@ namespace ZipkinTracer.Internal
 {
     internal class ServiceEndpoint : IServiceEndpoint
     {
-        public async Task<Endpoint> GetLocalEndpoint(string serviceName, ushort port)
+        public async Task<Endpoint> GetLocalEndpoint(string serviceName, IPAddress localIP, ushort port)
         {
             return new Endpoint
             {
                 ServiceName = serviceName,
-                IPAddress = await GetLocalIPAddress(),
+                IPAddress = await GetLocalIPAddress() ?? localIP,
                 Port = port
             };
         }
 
-        public async Task<Endpoint> GetRemoteEndpoint(Uri remoteServer, string remoteServiceName)
+        public async Task<Endpoint> GetRemoteEndpoint(string serviceName, Uri serviceUri)
         {
-            var address = await GetRemoteIPAddress(remoteServer);
-            var addressBytes = address.GetAddressBytes();
-            if (BitConverter.IsLittleEndian)
+            return new Endpoint
             {
-                Array.Reverse(addressBytes);
-            }
-
-            var ipAddressStr = BitConverter.ToInt32(addressBytes, 0);
-            var hostIPAddressStr = IPAddress.HostToNetworkOrder(ipAddressStr);
-
-            return new Endpoint()
-            {
-                ServiceName = remoteServiceName,
-                IPAddress = await GetRemoteIPAddress(remoteServer),
-                Port = (ushort) remoteServer.Port
+                ServiceName = serviceName,
+                IPAddress = await GetRemoteIPAddress(serviceUri),
+                Port = (ushort)serviceUri.Port
             };
         }
 
@@ -46,16 +36,23 @@ namespace ZipkinTracer.Internal
                 return null;
             }
 
-            IPHostEntry host = await Dns.GetHostEntryAsync(Dns.GetHostName());
+            try
+            {
+                var host = await Dns.GetHostEntryAsync(Dns.GetHostName());
 
-            return host
-                .AddressList
-                .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+                return host
+                    .AddressList
+                    .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
-        private async Task<IPAddress> GetRemoteIPAddress(Uri remoteServer)
+        private async Task<IPAddress> GetRemoteIPAddress(Uri uri)
         {
-            var adressList = await Dns.GetHostAddressesAsync(remoteServer.Host);
+            var adressList = await Dns.GetHostAddressesAsync(uri.Host);
             return adressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
         }
     }

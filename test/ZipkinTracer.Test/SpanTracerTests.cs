@@ -40,10 +40,10 @@ namespace ZipkinTracer.Test
             var zipkinEndpoint = Substitute.For<IServiceEndpoint>();
             var zipkinConfig = new ZipkinConfig(new Uri("http://localhost"));
             var localEndpoint = new Endpoint {ServiceName = "server.com", Port = 999};
-            zipkinEndpoint.GetLocalEndpoint(null, 0).ReturnsForAnyArgs(localEndpoint);
+            zipkinEndpoint.GetLocalEndpoint(null, null, 0).ReturnsForAnyArgs(localEndpoint);
 
             var st = new SpanTracer(zipkinConfig, spanCollector, zipkinEndpoint);
-			var trInfo = new TraceInfo(traceId, spanId, true, new Uri("http://localhost"), parentSpanId);
+			var trInfo = new TraceInfo(traceId, spanId, true, new Uri("http://localhost"), null, parentSpanId);
             var resultSpan = await st.ReceiveServerSpan(requestName, trInfo, requestUri);
 
             Assert.AreEqual(requestName, resultSpan.Name);
@@ -80,10 +80,10 @@ namespace ZipkinTracer.Test
             var zipkinEndpoint = Substitute.For<IServiceEndpoint>();
             var zipkinConfig = new ZipkinConfig(new Uri("http://localhost"));
             var localEndpoint = new Endpoint { ServiceName = "server.com", Port = 999 };
-            zipkinEndpoint.GetLocalEndpoint(null, 0).ReturnsForAnyArgs(localEndpoint);
+            zipkinEndpoint.GetLocalEndpoint(null, null, 0).ReturnsForAnyArgs(localEndpoint);
 
             var st = new SpanTracer(zipkinConfig, spanCollector, zipkinEndpoint);
-			var trInfo = new TraceInfo(traceId, spanId, true, new Uri("http://localhost"), parentSpanId);
+			var trInfo = new TraceInfo(traceId, spanId, true, new Uri("http://localhost"), null, parentSpanId);
 			var resultSpan = await st.ReceiveServerSpan(requestName, trInfo, requestUri);
             var annotation = resultSpan.Annotations[0] as Annotation;
 

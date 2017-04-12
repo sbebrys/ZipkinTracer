@@ -27,9 +27,9 @@ namespace ZipkinTracer.Internal
         public async Task<Span> ReceiveServerSpan(string spanName, TraceInfo traceInfo, Uri requestUri)
         {
             var serviceName = CleanServiceName(traceInfo.Domain.Host);
-            var newSpan = new Span(spanName, traceInfo.SpanId, traceInfo.ParentSpanId, traceInfo.TraceId,
-                traceInfo.Domain);
-            var serviceEndpoint = await _zipkinEndpoint.GetLocalEndpoint(serviceName, (ushort) requestUri.Port);
+            var newSpan = new Span(spanName, traceInfo.SpanId, traceInfo.ParentSpanId, 
+                traceInfo.TraceId, traceInfo.Domain, traceInfo.LocalIP);
+            var serviceEndpoint = await _zipkinEndpoint.GetLocalEndpoint(serviceName, traceInfo.LocalIP, (ushort)requestUri.Port);
 
             var annotation = new Annotation
             {
@@ -76,9 +76,9 @@ namespace ZipkinTracer.Internal
         public async Task<Span> SendClientSpan(string spanName, TraceInfo traceInfo, Uri remoteUri)
         {
             var serviceName = CleanServiceName(traceInfo.Domain.Host);
-            var newSpan = new Span(spanName, traceInfo.SpanId, traceInfo.ParentSpanId, traceInfo.TraceId,
-                traceInfo.Domain);
-            var serviceEndpoint = await _zipkinEndpoint.GetLocalEndpoint(serviceName, (ushort) remoteUri.Port);
+            var newSpan = new Span(spanName, traceInfo.SpanId, traceInfo.ParentSpanId,
+                traceInfo.TraceId, traceInfo.Domain, traceInfo.LocalIP);
+            var serviceEndpoint = await _zipkinEndpoint.GetLocalEndpoint(serviceName, traceInfo.LocalIP, (ushort)remoteUri.Port);
             var clientServiceName = CleanServiceName(remoteUri.Host);
 
             var annotation = new Annotation
@@ -90,7 +90,7 @@ namespace ZipkinTracer.Internal
             newSpan.Annotations.Add(annotation);
             AddBinaryAnnotation(TraceKeys.HttpPath, remoteUri.AbsolutePath, newSpan, serviceEndpoint);
             AddBinaryAnnotation(TraceKeys.ServerAddr, "1", newSpan,
-                await _zipkinEndpoint.GetRemoteEndpoint(remoteUri, clientServiceName));
+                await _zipkinEndpoint.GetRemoteEndpoint(clientServiceName, remoteUri));
 
             return newSpan;
         }
@@ -128,6 +128,7 @@ namespace ZipkinTracer.Internal
         {
             var serviceName = CleanServiceName(span.Domain.Host);
             var servicePort = (ushort) span.Domain.Port;
+            var localIP = span.LocalIP;
 
             if (span == null)
                 throw new ArgumentNullException(nameof(span),
@@ -135,7 +136,7 @@ namespace ZipkinTracer.Internal
 
             span.Annotations.Add(new Annotation
             {
-                Host = await _zipkinEndpoint.GetLocalEndpoint(serviceName, servicePort),
+                Host = await _zipkinEndpoint.GetLocalEndpoint(serviceName, localIP, servicePort),
                 Value = value
             });
         }
@@ -143,13 +144,14 @@ namespace ZipkinTracer.Internal
         public async Task RecordBinary(Span span, string key, object value)
         {
             var serviceName = CleanServiceName(span.Domain.Host);
-            var servicePort = (ushort) span.Domain.Port;
+            var servicePort = (ushort)span.Domain.Port;
+            var localIP = span.LocalIP;
 
             if (span == null)
                 throw new ArgumentNullException(nameof(span),
                     "In order to record a binary annotation, the span must be not null.");
 
-            var host = await _zipkinEndpoint.GetLocalEndpoint(serviceName, servicePort);
+            var host = await _zipkinEndpoint.GetLocalEndpoint(serviceName, localIP, servicePort);
 
             span.Annotations.Add(new BinaryAnnotation
             {

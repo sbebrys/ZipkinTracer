@@ -46,10 +46,10 @@ namespace ZipkinTracer
         /// <param name="remoteUri"></param>
         /// <param name="methodName"></param>
         /// <returns>Span of client trace</returns>
-        public Task<Span> StartClientTrace(Uri remoteUri, string methodName)
+        public async Task<Span> StartClientTrace(Uri remoteUri, string methodName)
         {
             if (_traceInfoAccessor.TraceInfo == null)
-                return Task.FromResult<Span>(null);
+                return null;
 
             // new trace info
             var traceInfo = new TraceInfo(_traceInfoAccessor.TraceInfo);
@@ -58,16 +58,16 @@ namespace ZipkinTracer
             _traceInfoAccessor.TraceInfo = traceInfo;
 
             if (!traceInfo.IsTraceOn || !_zipkinConfig.Enabled || string.IsNullOrEmpty(methodName))
-                return Task.FromResult<Span>(null);
+                return null;
 
             try
             {
-                return _spanTracer.SendClientSpan(methodName.ToLower(), traceInfo, remoteUri);
+                return await _spanTracer.SendClientSpan(methodName.ToLower(), traceInfo, remoteUri);
             }
             catch (Exception ex)
             {
                 _logger.LogError(new EventId(0), ex, "Error Starting Client Trace");
-                return Task.FromResult<Span>(null);
+                return null;
             }
         }
 
@@ -102,21 +102,21 @@ namespace ZipkinTracer
         /// <param name="requestUri"></param>
         /// <param name="methodName"></param>
         /// <returns></returns>
-        public Task<Span> StartServerTrace(Uri requestUri, string methodName)
+        public async Task<Span> StartServerTrace(Uri requestUri, string methodName)
         {
             try
             {
                 var traceInfo = _traceInfoAccessor.TraceInfo;
 
                 if (!traceInfo.IsTraceOn || !_zipkinConfig.Enabled || string.IsNullOrEmpty(methodName))
-                    return Task.FromResult<Span>(null);
+                    return null;
 
-                return _spanTracer.ReceiveServerSpan(methodName.ToLower(), traceInfo, requestUri);
+                return await _spanTracer.ReceiveServerSpan(methodName.ToLower(), traceInfo, requestUri);
             }
             catch (Exception ex)
             {
                 _logger.LogError(new EventId(0), ex, "Error Starting Server Trace");
-                return Task.FromResult<Span>(null);
+                return null;
             }
         }
 
@@ -211,7 +211,7 @@ namespace ZipkinTracer
             }
         }
 
-        internal TraceInfo GetCurrentTraceInfo()
+        private TraceInfo GetCurrentTraceInfo()
         {
             return _traceInfoAccessor.TraceInfo;
         }
