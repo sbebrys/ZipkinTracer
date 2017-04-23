@@ -19,21 +19,23 @@ namespace ZipkinTracer.Models
         public Uri Domain { get; }
         public IPAddress LocalIP { get; }
         public bool IsSampled { get; }
+        public bool IsJoinedSpan { get; }
         public TraceInfo ParentTraceInfo { get; }
 
         public bool IsTraceOn => !string.IsNullOrEmpty(TraceId) && IsSampled;
 
-        public TraceInfo(string traceId, string spanId, bool isSampled, Uri domain, IPAddress localIP = null, string parentSpanId = null)
+        public TraceInfo(string traceId, string spanId, bool isSampled, bool isJoinedSpan, Uri domain, IPAddress localIP = null, string parentSpanId = null)
         {
             TraceId = traceId;
             SpanId = spanId;
             IsSampled = isSampled;
+            IsJoinedSpan = isJoinedSpan;
             Domain = domain;
             LocalIP = localIP;
 
             if (!string.IsNullOrEmpty(parentSpanId))
             {
-                ParentTraceInfo = new TraceInfo(traceId, parentSpanId, isSampled, domain, localIP);
+                ParentTraceInfo = new TraceInfo(traceId, parentSpanId, isSampled, true, domain, localIP);
             }
         }
 
@@ -43,6 +45,7 @@ namespace ZipkinTracer.Models
             TraceId = parentTraceInfo?.TraceId;
             SpanId = TraceIdHelper.GenerateHexEncodedInt64Id();
             IsSampled = parentTraceInfo?.IsSampled ?? false;
+            IsJoinedSpan = false;
             Domain = parentTraceInfo?.Domain;
             LocalIP = parentTraceInfo?.LocalIP;
         }

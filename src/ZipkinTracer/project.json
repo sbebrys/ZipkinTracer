@@ -1,32 +1,35 @@
 {
-	"title": "ZipkinTracer",
-	"copyright": "Copyright © 2017 Cinkciarz.pl",
-	"authors": [ "Sebastian Bebrys" ],
-	
-	"description": ".Net Core Zipkin Tracer",
-	"version": "1.2.1",
+  "title": "ZipkinTracer",
+  "copyright": "Copyright © 2017 Cinkciarz.pl",
+  "authors": [ "Sebastian Bebrys" ],
 
-	"dependencies": {
-		"Microsoft.AspNetCore.Http.Abstractions": "1.1.1",
-		"Microsoft.AspNetCore.Http.Extensions": "1.1.1",
-		"Microsoft.AspNetCore.Owin": "1.1.1",
-		"Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0",
-		"Microsoft.Extensions.Logging": "1.1.1",
-		"Microsoft.Extensions.Logging.Abstractions": "1.1.1",
-		"Newtonsoft.Json": "10.0.1",
-		"System.Net.NameResolution": "4.3.0",
-		"System.Net.NetworkInformation": "4.3.0"
-	},
+  "description": ".Net Core Zipkin Tracer",
+  "version": "1.3.0",
 
-	"frameworks": {
-		"netstandard1.3": {
-		},
-		"net46": {
-		}
-	},
+  "dependencies": {
+    "Microsoft.AspNetCore.Http.Abstractions": "1.1.1",
+    "Microsoft.AspNetCore.Http.Extensions": "1.1.1",
+    "Microsoft.AspNetCore.Owin": "1.1.1",
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0",
+    "Microsoft.Extensions.Logging": "1.1.1",
+    "Microsoft.Extensions.Logging.Abstractions": "1.1.1",
+    "Newtonsoft.Json": "10.0.1",
+    "System.Net.NameResolution": "4.3.0",
+    "System.Net.NetworkInformation": "4.3.0"
+  },
 
-	"packOptions": {
-		"owners": [ "Cinkciarz.pl" ],
-		"tags": [ "Zipkin", "ZipkinClient", "ZipkinTracer", "Zipkin Client", "Zipkin Tracer", ".Net Core Zipkin" ]
-	}
+  "frameworks": {
+    "netstandard1.3": {
+    },
+    "net46": {
+    }
+  },
+
+  "packOptions": {
+    "summary": "A .NET Core implementation of the Zipkin Tracer Client.",
+    "owners": [ "Cinkciarz.pl" ],
+    "tags": [ "Zipkin", "ZipkinClient", "ZipkinTracer", "Zipkin Client", "Zipkin Tracer", ".Net Core Zipkin" ],
+    "projectUrl": "https://github.com/sbebrys/ZipkinTracer",
+    "requireLicenseAcceptance": false
+  }
 }

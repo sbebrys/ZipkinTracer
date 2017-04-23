@@ -15,7 +15,8 @@ namespace ZipkinTracer.Test.Models.Serialization.Json
         public void JsonSpan()
         {
             // Arrange
-	        var span = new Span("15", "cnk", "05", "123", new Uri("http://localhost"), IPAddress.Loopback);
+            var traceInfo = new TraceInfo("05", "123", true, false, new Uri("http://localhost"), IPAddress.Loopback);
+	        var span = new Span("15", traceInfo);
 
             var annotation = Substitute.For<Annotation>();
             var binaryAnnotation = Substitute.For<BinaryAnnotation>();
@@ -41,7 +42,8 @@ namespace ZipkinTracer.Test.Models.Serialization.Json
         public void JsonSpan_ParentIdIsWhiteSpace()
         {
             // Arrange
-	        var span = new Span(string.Empty, string.Empty, string.Empty, string.Empty, null, IPAddress.Loopback);
+            var traceInfo = new TraceInfo(string.Empty, string.Empty, true, false, null, IPAddress.Loopback);
+	        var span = new Span(string.Empty, traceInfo);
 
             // Act
             var result = new JsonSpan(span);

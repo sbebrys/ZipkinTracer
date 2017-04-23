@@ -23,22 +23,24 @@ namespace ZipkinTracer.Http
             _client = client;
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-            CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             // start record span
             var span = await _client.StartClientTrace(request.RequestUri, $"{request.Method} {request.RequestUri.AbsolutePath}");
-            var traceInfo = _client.GetCurrentTraceInfo();
+            var traceInfo = span?.TraceInfo;
 
             try
             {
-                // rewrite traceInfo to request headers
-                request.Headers.Add(TraceInfo.TraceIdHeaderName, traceInfo.TraceId);
-                request.Headers.Add(TraceInfo.SpanIdHeaderName, traceInfo.SpanId);
-                request.Headers.Add(TraceInfo.ParentSpanIdHeaderName, traceInfo.ParentSpanId);
-                request.Headers.Add(TraceInfo.SampledHeaderName, traceInfo.IsSampled.ToString());
+                if (traceInfo != null)
+                {
+                    // rewrite traceInfo to request headers
+                    request.Headers.Add(TraceInfo.TraceIdHeaderName, traceInfo.TraceId);
+                    request.Headers.Add(TraceInfo.SpanIdHeaderName, traceInfo.SpanId);
+                    request.Headers.Add(TraceInfo.ParentSpanIdHeaderName, traceInfo.ParentSpanId);
+                    request.Headers.Add(TraceInfo.SampledHeaderName, traceInfo.IsSampled.ToString());
 
-                request.Properties[TraceInfo.TraceInfoKey] = traceInfo;
+                    request.Properties[TraceInfo.TraceInfoKey] = traceInfo;
+                }
 
                 var response = await base.SendAsync(request, cancellationToken);
 

@@ -33,7 +33,8 @@ namespace ZipkinTracer.Test
             var collection = new BlockingCollection<Span>();
             var collector = new SpanCollector(collection);
 
-            collector.Collect(new Span(string.Empty, string.Empty, string.Empty, string.Empty, null, IPAddress.Loopback));
+            var traceInfo = new TraceInfo(string.Empty, string.Empty, true, false, null, IPAddress.Loopback);
+            collector.Collect(new Span(string.Empty, traceInfo));
 
             Assert.AreEqual(collection.Count, 1);
         }
@@ -54,7 +55,8 @@ namespace ZipkinTracer.Test
         [Test]
         public void TryTake_NotEmptyCollection_ReturnSpan()
         {
-	        var span = new Span(string.Empty, "TestSpanId", string.Empty, string.Empty, null, IPAddress.Loopback);
+            var traceInfo = new TraceInfo(string.Empty, "TestSpanId", true, false, null, IPAddress.Loopback);
+            var span = new Span(string.Empty, traceInfo);
 
 			var collection = new BlockingCollection<Span>();
             var collector = new SpanCollector(collection);
@@ -71,7 +73,8 @@ namespace ZipkinTracer.Test
         [Test]
         public void TryTake_NotEmptyCollection_ClearCollection()
         {
-            var span = new Span(string.Empty, "TestSpanId", string.Empty, string.Empty, null, IPAddress.Loopback);
+            var traceInfo = new TraceInfo(string.Empty, "TestSpanId", true, false, null, IPAddress.Loopback);
+            var span = new Span(string.Empty, traceInfo);
             var collection = new BlockingCollection<Span>();
             var collector = new SpanCollector(collection);
 

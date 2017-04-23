@@ -1,4 +1,5 @@
 ﻿using System;
+using ZipkinTracer.Extensions;
 using Newtonsoft.Json;
 
 namespace ZipkinTracer.Models.Serialization.Json
@@ -14,7 +15,7 @@ namespace ZipkinTracer.Models.Serialization.Json
         public string Key => _binaryAnnotation.Key;
 
         [JsonProperty("value")]
-        public string Value => _binaryAnnotation.Value.ToString();
+        public string Value => _binaryAnnotation.Value.AsAnnotationValue();
 
         public JsonBinaryAnnotation(BinaryAnnotation binaryAnnotation)
         {

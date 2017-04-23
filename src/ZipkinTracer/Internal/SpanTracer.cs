@@ -27,8 +27,7 @@ namespace ZipkinTracer.Internal
         public async Task<Span> ReceiveServerSpan(string spanName, TraceInfo traceInfo, Uri requestUri)
         {
             var serviceName = CleanServiceName(traceInfo.Domain.Host);
-            var newSpan = new Span(spanName, traceInfo.SpanId, traceInfo.ParentSpanId, 
-                traceInfo.TraceId, traceInfo.Domain, traceInfo.LocalIP);
+            var newSpan = new Span(spanName, traceInfo);
             var serviceEndpoint = await _zipkinEndpoint.GetLocalEndpoint(serviceName, traceInfo.LocalIP, (ushort)requestUri.Port);
 
             var annotation = new Annotation
@@ -76,8 +75,7 @@ namespace ZipkinTracer.Internal
         public async Task<Span> SendClientSpan(string spanName, TraceInfo traceInfo, Uri remoteUri)
         {
             var serviceName = CleanServiceName(traceInfo.Domain.Host);
-            var newSpan = new Span(spanName, traceInfo.SpanId, traceInfo.ParentSpanId,
-                traceInfo.TraceId, traceInfo.Domain, traceInfo.LocalIP);
+            var newSpan = new Span(spanName, traceInfo);
             var serviceEndpoint = await _zipkinEndpoint.GetLocalEndpoint(serviceName, traceInfo.LocalIP, (ushort)remoteUri.Port);
             var clientServiceName = CleanServiceName(remoteUri.Host);
 
@@ -89,7 +87,7 @@ namespace ZipkinTracer.Internal
 
             newSpan.Annotations.Add(annotation);
             AddBinaryAnnotation(TraceKeys.HttpPath, remoteUri.AbsolutePath, newSpan, serviceEndpoint);
-            AddBinaryAnnotation(TraceKeys.ServerAddr, "1", newSpan,
+            AddBinaryAnnotation(TraceKeys.ServerAddr, true, newSpan,
                 await _zipkinEndpoint.GetRemoteEndpoint(clientServiceName, remoteUri));
 
             return newSpan;
@@ -107,14 +105,16 @@ namespace ZipkinTracer.Internal
                 throw new ArgumentException("Invalid client span: Annotations list is invalid.");
             }
 
+            var host = span.Annotations.First().Host;
+
             var annotation = new Annotation
             {
-                Host = span.Annotations.First().Host,
+                Host = host,
                 Value = TraceKeys.ClientRecv
             };
 
             span.Annotations.Add(annotation);
-            AddBinaryAnnotation(TraceKeys.HttpStatusCode, statusCode.ToString(), span, span.Annotations.First().Host);
+            AddBinaryAnnotation(TraceKeys.HttpStatusCode, statusCode.ToString(), span, host);
 
             if (!string.IsNullOrEmpty(errorMessage))
             {

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Text;
 using ZipkinTracer.Models;
 using ZipkinTracer.Models.References;
 
@@ -27,6 +29,40 @@ namespace ZipkinTracer.Extensions
             return AnnotationTypeMappings.ContainsKey(type) ? AnnotationTypeMappings[type] : AnnotationType.String;
         }
 
+        public static string AsAnnotationValue(this object value)
+        {
+            var type = value.GetType().AsAnnotationType();
+            byte[] valueArray;
+
+            switch (type)
+            {
+                case AnnotationType.Boolean:
+                    valueArray = BitConverter.GetBytes((bool)value);
+                    break;
+                case AnnotationType.ByteArray:
+                    valueArray = value as byte[];
+                    break;
+                case AnnotationType.Int16:
+                    valueArray = ConvertBigEndian(BitConverter.GetBytes((double)value));
+                    break;
+                case AnnotationType.Int32:
+                    valueArray = ConvertBigEndian(BitConverter.GetBytes((double)value));
+                    break;
+                case AnnotationType.Int64:
+                    valueArray = ConvertBigEndian(BitConverter.GetBytes((double)value));
+                    break;
+                case AnnotationType.Double:
+                    valueArray = ConvertBigEndian(BitConverter.GetBytes((double)value));
+                    break;
+                case AnnotationType.String:
+                    return value as string;
+                default:
+                    throw new ArgumentException("Unsupported object type for binary annotation.");
+            }
+
+            return Encoding.UTF8.GetString(valueArray);
+        }
+
         public static IEnumerable<TAnnotation> GetAnnotationsByType<TAnnotation>(this Span span)
             where TAnnotation : AnnotationBase
         {
@@ -38,6 +74,33 @@ namespace ZipkinTracer.Extensions
             return Convert.ToInt64(
                 (value - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).Ticks / TicksPerMicrosecond
             );
+        }
+
+        public static string ToIPV4Integer(this IPAddress address)
+        {
+            if (address == null || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
+                return null;
+
+            var bytes = ConvertBigEndian(address.GetAddressBytes());
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        public static string ToIPV6Bytes(this IPAddress address)
+        {
+            if (address == null || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetworkV6)
+                return null;
+
+            var bytes = ConvertBigEndian(address.GetAddressBytes());
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        private static byte[] ConvertBigEndian(byte[] input)
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(input);
+            }
+            return input;
         }
     }
 }

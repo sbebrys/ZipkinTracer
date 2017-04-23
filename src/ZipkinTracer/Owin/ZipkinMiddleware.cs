@@ -18,41 +18,34 @@ namespace ZipkinTracer.Owin
     {
         private readonly RequestDelegate _next;
         private readonly ZipkinConfig _zipkinConfig;
-        private readonly ITraceInfoAccessor _traceInfoAccessor;
 
-        public ZipkinMiddleware(RequestDelegate next, ISpanProcessor spanProcessor,
-            ZipkinConfig zipkinConfig, ITraceInfoAccessor traceInfoAccessor)
+        public ZipkinMiddleware(RequestDelegate next, ISpanProcessor spanProcessor, ZipkinConfig zipkinConfig)
         {
             if (spanProcessor == null) throw new ArgumentNullException(nameof(spanProcessor));
             if (zipkinConfig == null) throw new ArgumentNullException(nameof(zipkinConfig));
-            if (traceInfoAccessor == null) throw new ArgumentNullException(nameof(traceInfoAccessor));
 
             _next = next;
             _zipkinConfig = zipkinConfig;
-            _traceInfoAccessor = traceInfoAccessor;
 
             spanProcessor.Start();
         }
 
         public async Task Invoke(HttpContext context)
         {
-            SetTraceInfoProperties(context);
-
             if (_zipkinConfig.Bypass != null && _zipkinConfig.Bypass(context.Request))
             {
                 await _next(context);
                 return;
             }
 
+            var traceClient = context.RequestServices.GetRequiredService<IZipkinTracer>();
+            var traceInfo = ReadTraceInfo(context);
             string headerSpanName = context.Request.Headers[TraceInfo.SpanNameHeaderName];
 
-            var spanName = !string.IsNullOrEmpty(headerSpanName)
-                ? headerSpanName
-                : $"{context.Request.Method} {context.Request.Path}";
-            var traceClient = context.RequestServices.GetRequiredService<IZipkinTracer>();
-            var span = await traceClient.StartServerTrace(new Uri(context.Request.GetEncodedUrl()), spanName);
+            var spanName = !string.IsNullOrEmpty(headerSpanName) ? headerSpanName : $"{context.Request.Method} {context.Request.Path}";
+            var span = await traceClient.StartServerTrace(new Uri(context.Request.GetEncodedUrl()), spanName, traceInfo);
 
-            context.Response.OnStarting(
+            context.Response.OnCompleted(
                 response =>
                 {
                     var httpResponse = response as HttpResponse;
@@ -69,7 +62,7 @@ namespace ZipkinTracer.Owin
             await _next(context);
         }
 
-        private void SetTraceInfoProperties(HttpContext context)
+        private TraceInfo ReadTraceInfo(HttpContext context)
         {
             string headerTraceId = context.Request.Headers[TraceInfo.TraceIdHeaderName];
             string headerSpanId = context.Request.Headers[TraceInfo.SpanIdHeaderName];
@@ -77,18 +70,18 @@ namespace ZipkinTracer.Owin
             string headerSampled = context.Request.Headers[TraceInfo.SampledHeaderName];
             var requestPath = context.Request.Path.ToString();
 
-            var traceId = headerTraceId.IsParsableTo128Or64Bit()
-                ? headerTraceId
-                : TraceIdHelper.GenerateNewTraceId(_zipkinConfig.Create128BitTraceId);
+            var traceId = headerTraceId.IsParsableTo128Or64Bit() ? headerTraceId : TraceIdHelper.GenerateNewTraceId(_zipkinConfig.Create128BitTraceId);
             var spanId = headerSpanId.IsParsableToLong() ? headerSpanId : TraceIdHelper.GenerateHexEncodedInt64Id();
             var parentSpanId = headerParentSpanId.IsParsableToLong() ? headerParentSpanId : string.Empty;
             var isSampled = _zipkinConfig.ShouldBeSampled(headerSampled, requestPath);
             var domain = _zipkinConfig.Domain(context.Request);
+            var isJoinedSpan = spanId.Equals(headerSpanId);
 
-            var traceInfo = new TraceInfo(traceId, spanId, isSampled, domain, context.Connection.LocalIpAddress, parentSpanId);
-            _traceInfoAccessor.TraceInfo = traceInfo;
+            var traceInfo = new TraceInfo(traceId, spanId, isSampled, isJoinedSpan, domain, context.Connection.LocalIpAddress, parentSpanId);
 
             context.Items[TraceInfo.TraceInfoKey] = traceInfo;
+
+            return traceInfo;
         }
 
         private static bool IsErrorStatusCode(int statusCode)

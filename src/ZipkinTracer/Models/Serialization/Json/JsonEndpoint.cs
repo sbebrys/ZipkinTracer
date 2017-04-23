@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using ZipkinTracer.Extensions;
 
 namespace ZipkinTracer.Models.Serialization.Json
 {
@@ -8,7 +9,10 @@ namespace ZipkinTracer.Models.Serialization.Json
         private readonly Endpoint _endpoint;
 
         [JsonProperty("ipv4")]
-        public string IPv4 => _endpoint.IPAddress.ToString();
+        public string IPv4 => _endpoint.IPAddress.ToIPV4Integer();
+
+        [JsonProperty("ipv6")]
+        public string IPv6 => _endpoint.IPAddress.ToIPV6Bytes();
 
         [JsonProperty("port")]
         public ushort Port => _endpoint.Port;

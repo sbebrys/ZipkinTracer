@@ -81,7 +81,7 @@ namespace ZipkinTracer
         {
             try
             {
-                if (string.IsNullOrEmpty(clientSpan?.TraceId))
+                if (clientSpan?.TraceInfo == null)
                     return;
 
                 _spanTracer.ReceiveClientSpan(clientSpan, statusCode, errorMessage);
@@ -92,7 +92,7 @@ namespace ZipkinTracer
             }
             finally
             {
-                _traceInfoAccessor.TraceInfo = _traceInfoAccessor.TraceInfo?.ParentTraceInfo;
+                _traceInfoAccessor.TraceInfo = clientSpan?.TraceInfo?.ParentTraceInfo;
             }
         }
 
@@ -100,18 +100,19 @@ namespace ZipkinTracer
         /// Start server trace
         /// </summary>
         /// <param name="requestUri"></param>
-        /// <param name="methodName"></param>
+        /// <param name="spanName"></param>
+        /// <param name="traceInfo"></param>
         /// <returns></returns>
-        public async Task<Span> StartServerTrace(Uri requestUri, string methodName)
+        public async Task<Span> StartServerTrace(Uri requestUri, string spanName, TraceInfo traceInfo)
         {
             try
             {
-                var traceInfo = _traceInfoAccessor.TraceInfo;
+                _traceInfoAccessor.TraceInfo = traceInfo;
 
-                if (!traceInfo.IsTraceOn || !_zipkinConfig.Enabled || string.IsNullOrEmpty(methodName))
+                if (traceInfo == null || !traceInfo.IsTraceOn || !_zipkinConfig.Enabled || string.IsNullOrEmpty(spanName))
                     return null;
 
-                return await _spanTracer.ReceiveServerSpan(methodName.ToLower(), traceInfo, requestUri);
+                return await _spanTracer.ReceiveServerSpan(spanName.ToLower(), traceInfo, requestUri);
             }
             catch (Exception ex)
             {
@@ -128,7 +129,7 @@ namespace ZipkinTracer
         /// <param name="errorMessage"></param>
         public void EndServerTrace(Span serverSpan, int statusCode, string errorMessage = null)
         {
-            if (string.IsNullOrEmpty(serverSpan?.TraceId))
+            if (serverSpan?.TraceInfo == null)
                 return;
 
             try
@@ -149,7 +150,7 @@ namespace ZipkinTracer
         /// (or its value set to null), the method caller member name will be automatically passed.</param>
         public async Task Record(Span span, [CallerMemberName] string value = null)
         {
-            if (string.IsNullOrEmpty(span?.TraceId))
+            if (span?.TraceInfo == null)
                 return;
 
             try
@@ -178,7 +179,7 @@ namespace ZipkinTracer
         /// respective ToString() method.</remarks>
         public async Task RecordBinary<T>(Span span, string key, T value)
         {
-            if (string.IsNullOrEmpty(span?.TraceId))
+            if (span?.TraceInfo == null)
                 return;
 
             try
@@ -209,16 +210,6 @@ namespace ZipkinTracer
             {
                 _logger.LogError(new EventId(0), ex, $"Error recording local trace (value: {value})");
             }
-        }
-
-        private TraceInfo GetCurrentTraceInfo()
-        {
-            return _traceInfoAccessor.TraceInfo;
-        }
-
-        TraceInfo IZipkinTracer.GetCurrentTraceInfo()
-        {
-            return GetCurrentTraceInfo();
         }
     }
 }
