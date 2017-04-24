@@ -79,11 +79,11 @@ namespace ZipkinTracer
         /// <param name="errorMessage"></param>
         public void EndClientTrace(Span clientSpan, int statusCode, string errorMessage = null)
         {
+            if (clientSpan?.TraceInfo == null)
+                 return;
+
             try
             {
-                if (clientSpan?.TraceInfo == null)
-                    return;
-
                 _spanTracer.ReceiveClientSpan(clientSpan, statusCode, errorMessage);
             }
             catch (Exception ex)
@@ -107,8 +107,6 @@ namespace ZipkinTracer
         {
             try
             {
-                _traceInfoAccessor.TraceInfo = traceInfo;
-
                 if (traceInfo == null || !traceInfo.IsTraceOn || !_zipkinConfig.Enabled || string.IsNullOrEmpty(spanName))
                     return null;
 

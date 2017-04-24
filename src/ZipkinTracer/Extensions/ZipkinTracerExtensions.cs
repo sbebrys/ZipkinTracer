@@ -32,35 +32,21 @@ namespace ZipkinTracer.Extensions
         public static string AsAnnotationValue(this object value)
         {
             var type = value.GetType().AsAnnotationType();
-            byte[] valueArray;
 
             switch (type)
             {
-                case AnnotationType.Boolean:
-                    valueArray = BitConverter.GetBytes((bool)value);
-                    break;
                 case AnnotationType.ByteArray:
-                    valueArray = value as byte[];
-                    break;
+                    return Convert.ToBase64String(value as byte[]);
+                case AnnotationType.Boolean:
                 case AnnotationType.Int16:
-                    valueArray = ConvertBigEndian(BitConverter.GetBytes((double)value));
-                    break;
                 case AnnotationType.Int32:
-                    valueArray = ConvertBigEndian(BitConverter.GetBytes((double)value));
-                    break;
                 case AnnotationType.Int64:
-                    valueArray = ConvertBigEndian(BitConverter.GetBytes((double)value));
-                    break;
                 case AnnotationType.Double:
-                    valueArray = ConvertBigEndian(BitConverter.GetBytes((double)value));
-                    break;
                 case AnnotationType.String:
-                    return value as string;
+                    return value.ToString();
                 default:
                     throw new ArgumentException("Unsupported object type for binary annotation.");
             }
-
-            return Encoding.UTF8.GetString(valueArray);
         }
 
         public static IEnumerable<TAnnotation> GetAnnotationsByType<TAnnotation>(this Span span)
@@ -81,8 +67,7 @@ namespace ZipkinTracer.Extensions
             if (address == null || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
                 return null;
 
-            var bytes = ConvertBigEndian(address.GetAddressBytes());
-            return BitConverter.ToUInt32(bytes, 0).ToString();
+            return address.ToString();
         }
 
         public static string ToIPV6Bytes(this IPAddress address)
@@ -90,8 +75,7 @@ namespace ZipkinTracer.Extensions
             if (address == null || address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetworkV6)
                 return null;
 
-            var bytes = ConvertBigEndian(address.GetAddressBytes());
-            return Encoding.UTF8.GetString(bytes);
+            return address.ToString();
         }
 
         private static byte[] ConvertBigEndian(byte[] input)

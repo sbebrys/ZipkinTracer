@@ -16,16 +16,19 @@ namespace ZipkinTracer.Owin
 {
     internal class ZipkinMiddleware
     {
+        private readonly ITraceInfoAccessor _traceInfoAccessor;
         private readonly RequestDelegate _next;
         private readonly ZipkinConfig _zipkinConfig;
 
-        public ZipkinMiddleware(RequestDelegate next, ISpanProcessor spanProcessor, ZipkinConfig zipkinConfig)
+        public ZipkinMiddleware(RequestDelegate next, ITraceInfoAccessor traceInfoAccessor, ISpanProcessor spanProcessor, ZipkinConfig zipkinConfig)
         {
+            if (traceInfoAccessor == null) throw new ArgumentNullException(nameof(traceInfoAccessor));
             if (spanProcessor == null) throw new ArgumentNullException(nameof(spanProcessor));
             if (zipkinConfig == null) throw new ArgumentNullException(nameof(zipkinConfig));
 
             _next = next;
             _zipkinConfig = zipkinConfig;
+            _traceInfoAccessor = traceInfoAccessor;
 
             spanProcessor.Start();
         }
@@ -80,6 +83,7 @@ namespace ZipkinTracer.Owin
             var traceInfo = new TraceInfo(traceId, spanId, isSampled, isJoinedSpan, domain, context.Connection.LocalIpAddress, parentSpanId);
 
             context.Items[TraceInfo.TraceInfoKey] = traceInfo;
+            _traceInfoAccessor.TraceInfo = traceInfo;
 
             return traceInfo;
         }
