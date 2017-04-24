@@ -23,10 +23,10 @@ namespace ZipkinTracer.Models.Serialization.Json
         [JsonProperty("parentId", NullValueHandling = NullValueHandling.Ignore)]
         public string ParentId => string.IsNullOrWhiteSpace(_span.ParentId) ? null : _span.ParentId;
 
-        [JsonProperty("timestamp")]
+        [JsonProperty("timestamp", NullValueHandling = NullValueHandling.Ignore)]
         public long? Timestamp => _span.IsJoinedSpan ? null : ResolveBeginTimeStamp();
 
-        [JsonProperty("duration")]
+        [JsonProperty("duration", NullValueHandling = NullValueHandling.Ignore)]
         public long? Duration => _span.IsJoinedSpan ? null : ResolveDuration();
 
         [JsonProperty("annotations")]

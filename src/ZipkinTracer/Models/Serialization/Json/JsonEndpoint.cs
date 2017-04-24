@@ -8,10 +8,10 @@ namespace ZipkinTracer.Models.Serialization.Json
     {
         private readonly Endpoint _endpoint;
 
-        [JsonProperty("ipv4")]
+        [JsonProperty("ipv4", NullValueHandling = NullValueHandling.Ignore)]
         public string IPv4 => _endpoint.IPAddress.ToIPV4Integer();
 
-        [JsonProperty("ipv6")]
+        [JsonProperty("ipv6", NullValueHandling =NullValueHandling.Ignore)]
         public string IPv6 => _endpoint.IPAddress.ToIPV6Bytes();
 
         [JsonProperty("port")]

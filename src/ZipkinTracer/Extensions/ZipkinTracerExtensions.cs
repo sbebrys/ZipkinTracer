@@ -82,7 +82,7 @@ namespace ZipkinTracer.Extensions
                 return null;
 
             var bytes = ConvertBigEndian(address.GetAddressBytes());
-            return Encoding.UTF8.GetString(bytes);
+            return BitConverter.ToUInt32(bytes, 0).ToString();
         }
 
         public static string ToIPV6Bytes(this IPAddress address)
