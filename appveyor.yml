@@ -1,0 +1,20 @@
+﻿version: 1.0.{build}
+branches:
+  only:
+  - dev
+build_script:
+- ps: .\build.ps1
+test: on
+artifacts:
+- path: artifacts/packages/*.nupkg
+deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/zipkintracer/
+  api_key:
+    secure: m1G9sPA7/krfJUYdEW98ORIIyvANCn/eb+dAPSLdy4l1preU9Mf38b2FyqFWpHVR
+  skip_symbols: true
+  on:
+    branch: dev
+
+skip_commits:
+  message: /docs.*/
