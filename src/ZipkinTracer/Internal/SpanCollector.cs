@@ -18,7 +18,7 @@ namespace ZipkinTracer.Internal
         {
             if (span != null)
             {
-                _spanQueue.Add(span);
+                _spanQueue.TryAdd(span);
             }
         }
 
