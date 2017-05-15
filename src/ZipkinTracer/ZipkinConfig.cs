@@ -82,9 +82,9 @@ namespace ZipkinTracer
         public bool Enabled { get; set; } = true;
 
         /// <summary>
-		    /// Max requests queue size
-		    /// </summary>
-		    public int MaxQueueSize { get; set; }
+        /// Max requests queue size
+        /// </summary>
+        public int MaxQueueSize { get; set; }
 
         /// <summary>
         /// .ctor
