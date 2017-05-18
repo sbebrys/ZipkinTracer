@@ -14,8 +14,10 @@ namespace ZipkinTracer.DependencyInjection
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
+            var maxSize = config.MaxQueueSize <= 0 ? 100 : config.MaxQueueSize;
+
             services.AddSingleton(config);
-            services.AddSingleton(new BlockingCollection<Span>(config.MaxQueueSize));
+            services.AddSingleton(new BlockingCollection<Span>(maxSize));
             services.AddSingleton<IServiceEndpoint, ServiceEndpoint>();
             services.AddSingleton<ISpanProcessorTask, SpanProcessorTask>();
             services.AddSingleton<ISpanProcessor, SpanProcessor>();

@@ -84,7 +84,7 @@ namespace ZipkinTracer
         /// <summary>
         /// Max requests queue size
         /// </summary>
-        public int MaxQueueSize { get; set; }
+        public int MaxQueueSize { get; set; } = 100;
 
         /// <summary>
         /// .ctor
