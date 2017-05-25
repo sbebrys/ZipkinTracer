@@ -1,20 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EA906D23-DB64-486A-85B6-1DAD125FA38C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{5E131FBE-BE5B-4D8C-9600-E0118DE41682}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ZipkinTracer", "src\ZipkinTracer\ZipkinTracer.xproj", "{3146C52B-092A-4141-ABA0-E1FB90C8E5A1}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{51712627-D420-4278-A70C-3EC2852590E4}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ZipkinTracer.Test", "test\ZipkinTracer.Test\ZipkinTracer.Test.xproj", "{7C736116-3A27-4099-878C-A3CD2A05017F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{05EDB956-3D1D-4985-8DC5-B19BD576722D}"
 	ProjectSection(SolutionItems) = preProject
@@ -23,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{05EDB956
 		build.ps1 = build.ps1
 		cake.config = cake.config
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZipkinTracer", "src\ZipkinTracer\ZipkinTracer.csproj", "{3146C52B-092A-4141-ABA0-E1FB90C8E5A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZipkinTracer.Test", "test\ZipkinTracer.Test\ZipkinTracer.Test.csproj", "{7C736116-3A27-4099-878C-A3CD2A05017F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
