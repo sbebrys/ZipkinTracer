@@ -4,7 +4,7 @@ var configuration   = Argument<string>("configuration", "Release");
 ///////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
 ///////////////////////////////////////////////////////////////////////////////
-var isLocalBuild        = !AppVeyor.IsRunningOnAppVeyor;
+var isAppVeyor          = AppVeyor.IsRunningOnAppVeyor;
 var isWindows           = IsRunningOnWindows();
 var packPath            = Directory("./src/ZipkinTracer");
 var buildArtifacts      = Directory("./artifacts/packages");
