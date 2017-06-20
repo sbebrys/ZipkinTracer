@@ -70,7 +70,7 @@ public class Startup
 			SpanProcessorBatchSize = 10,
 			SampleRate = 0.5
 		}
-        app.AddZipkinTracer(config);
+        services.AddZipkinTracer(config);
     }
 }
 
